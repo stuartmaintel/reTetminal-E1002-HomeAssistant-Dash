@@ -16,6 +16,7 @@ esphome:
   friendly_name: Kitchen Panel
   includes:
     - config_server.h
+    - display_lambda.h
   libraries:
     - ArduinoJson
   on_boot:
@@ -31,7 +32,7 @@ esphome:
       # Initial sensor readings
       - component.update: battery_voltage
       - component.update: battery_level
-      - component.update: internal_temp_sensor
+      - component.update: sht4x_sensor
       # Brief LED flash to confirm boot (matches Seeed wiki pattern)
       - light.turn_on: onboard_led
       - delay: 200ms
@@ -53,6 +54,8 @@ esp32:
   board: esp32-s3-devkitc-1
   framework:
     type: esp-idf
+    advanced:
+      enable_idf_experimental_features: true
   flash_size: 32MB
 
 psram:
@@ -116,9 +119,12 @@ i2c:
 deep_sleep:
   id: deep_sleep_ctrl
   run_duration: 90s          # Active window: connect, update, draw, sleep
-  sleep_duration: 28min30s   # = 30 min total cycle
-  wakeup_pin: GPIO4           # Right white button wakes device
-  wakeup_pin_mode: INVERT_WAKEUP
+  sleep_duration: 36min   # = 38 min total cycle
+  esp32_ext1_wakeup:
+    pins:
+      - number: GPIO4
+        allow_other_uses: true  # also used as btn_right binary_sensor
+    mode: ANY_LOW               # ESP32-S3 uses ANY_LOW (not ALL_LOW)
 
 # -- GLOBALS -------------------------------------------------
 globals:
@@ -860,22 +866,22 @@ font:
   - file: "gfonts://Atkinson Hyperlegible@700"
     id: font_large
     size: 36
-    glyphs: "0123456789°C%kWh.-+/ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz "
+    glyphs: "0123456789°C%kWh.-+/ ABDEFGHIJKLMNOPQRSTUVXYZabcdefgijlmnopqrstuvwxyz"
 
   - file: "gfonts://Atkinson Hyperlegible@700"
     id: font_medium
     size: 22
-    glyphs: "0123456789°C%kWh.-+/:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz !@#&(),"
+    glyphs: "0123456789°C%kWh.-+/:ABDEFGHIJKLMNOPQRSTUVXYZabcdefgijlmnopqrstuvwxyz !@#&(),"
 
   - file: "gfonts://Atkinson Hyperlegible@400"
     id: font_small
     size: 16
-    glyphs: "0123456789°C%kWh.-+/:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz !@#&(),"
+    glyphs: "0123456789°C%kWh.-+/:ABDEFGHIJKLMNOPQRSTUVXYZabcdefgijlmnopqrstuvwxyz !@#&(),"
 
   - file: "gfonts://DM Mono@500"
     id: font_mono_small
     size: 13
-    glyphs: "0123456789°C%kWh.-+/:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz !@#&().,"
+    glyphs: "0123456789°C%kWh.-+/:ABDEFGHIJKLMNOPQRSTUVXYZabcdefgijlmnopqrstuvwxyz !@#&(),"
 
   # MDI icon font — codepoints for all icons used in this project
   # Full list: https://pictogrammers.com/library/mdi/
@@ -1000,15 +1006,12 @@ display:
     pages:
       - id: page1
         lambda: |-
-          #include "display_lambda.h"
           draw_page1(it);
       - id: page2
         lambda: |-
-          #include "display_lambda.h"
           draw_page2(it);
       - id: page3
         lambda: |-
-          #include "display_lambda.h"
           draw_page3(it);
 
 # -- HARDWARE OUTPUTS ----------------------------------------
@@ -1032,9 +1035,7 @@ output:
     id: buzzer_pwm
     frequency: 1000Hz
 
-# -- ONBOARD LED ---------------------------------------------
-# GPIO6, inverted=true (confirmed from Seeed wiki)
-output:
+  # Onboard LED — GPIO6, inverted=true (confirmed from Seeed wiki)
   - platform: gpio
     pin:
       number: GPIO6
@@ -1101,6 +1102,7 @@ binary_sensor:
       number: GPIO4
       mode: INPUT_PULLUP
       inverted: true
+      allow_other_uses: true  # also used as esp32_ext1_wakeup pin
     name: "Button Right"
     id: btn_right
     filters:
@@ -1156,6 +1158,7 @@ sensor:
 
   # -- Internal temperature / humidity (SHT40) --------------
   - platform: sht4x
+    id: sht4x_sensor
     temperature:
       name: "Internal Temperature"
       id: internal_temp_sensor
@@ -1584,7 +1587,7 @@ script:
           then:
             # Short press — force refresh current page
             - component.update: battery_level
-            - component.update: internal_temp_sensor
+            - component.update: sht4x_sensor
             - script.execute: show_current_page
           else:
             # Long press — show new page (config or page 1)
@@ -1697,6 +1700,6 @@ interval:
     then:
       - lambda: 'id(last_refresh_time_s) = 0;'  # reset cooldown
       - component.update: battery_level
-      - component.update: internal_temp_sensor
+      - component.update: sht4x_sensor
       - script.execute: show_current_page
       - logger.log: "12h safety refresh triggered"
