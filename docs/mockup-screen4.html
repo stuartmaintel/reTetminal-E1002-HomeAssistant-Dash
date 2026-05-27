@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=800, initial-scale=1.0">
+<title>Kitchen Panel — Screen 4 — Security</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.2.96/css/materialdesignicons.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=DM+Mono:wght@500&display=swap');
+
+:root {
+  --black:   #1a1a1a;
+  --white:   #f0ede8;
+  --red:     #c0392b;
+  --yellow:  #e6b800;
+  --blue:    #1a5fa8;
+  --green:   #2e7d32;
+  --bg:      #f0ede8;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #d0ccc5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+}
+
+.device-frame {
+  width: 820px;
+  background: #555;
+  border-radius: 6px;
+  padding: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.screen {
+  width: 800px;
+  height: 480px;
+  background: var(--bg);
+  display: flex;
+  overflow: hidden;
+  border: 1px solid #ccc;
+}
+
+/* ── LEFT BAR ── */
+.left-bar {
+  width: 240px;
+  height: 480px;
+  border-right: 2px solid var(--black);
+  display: flex;
+  flex-direction: column;
+  padding: 14px 14px 10px;
+  flex-shrink: 0;
+}
+
+.alarm-icon-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.alarm-icon-wrap .mdi {
+  font-size: 36px;
+}
+
+.alarm-state-text {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.alarm-since {
+  font-size: 12px;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 12px;
+}
+
+/* Armed = red, disarmed = green */
+.alarm-armed   .mdi,
+.alarm-armed   .alarm-state-text { color: var(--red); }
+.alarm-disarmed .mdi,
+.alarm-disarmed .alarm-state-text { color: var(--green); }
+.alarm-arming  .mdi,
+.alarm-arming  .alarm-state-text { color: var(--yellow); }
+
+.left-divider {
+  height: 1px;
+  background: var(--black);
+  margin: 8px 0;
+}
+
+/* Summary counts */
+.summary-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.summary-row .mdi { font-size: 16px; color: var(--black); }
+.summary-row.has-alert .mdi { color: var(--red); }
+.summary-count {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--black);
+  min-width: 18px;
+}
+.summary-label {
+  font-size: 12px;
+  color: var(--black);
+}
+.summary-row.has-alert .summary-label { color: var(--red); font-weight: 700; }
+
+/* History */
+.history-block {
+  margin-top: auto;
+}
+
+.history-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 6px;
+}
+
+.history-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+  opacity: 0.5;
+}
+
+.history-value {
+  font-size: 13px;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+}
+
+/* ── RIGHT PANEL ── */
+.right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 480px;
+  padding: 8px 12px 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Section header */
+.section-header {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+  margin: 6px 0 3px;
+  opacity: 0.5;
+}
+
+.section-header:first-child { margin-top: 0; }
+
+/* Sensor row */
+.sensor-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  margin-bottom: 3px;
+  border-left: 5px solid var(--black);
+}
+
+.sensor-row.open     { border-left-color: var(--red); }
+.sensor-row.closed   { border-left-color: var(--green); }
+.sensor-row.motion   { border-left-color: var(--blue); }
+.sensor-row.no-motion { border-left-color: var(--black); }
+.sensor-row.cam-motion { border-left-color: var(--blue); }
+.sensor-row.cam-clear  { border-left-color: var(--black); }
+
+.sensor-icon { font-size: 15px; color: var(--black); flex-shrink: 0; }
+.sensor-row.open   .sensor-icon { color: var(--red); }
+.sensor-row.motion .sensor-icon,
+.sensor-row.cam-motion .sensor-icon { color: var(--blue); }
+
+.sensor-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--black);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sensor-state {
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  min-width: 52px;
+  text-align: right;
+}
+
+.sensor-row.open   .sensor-state { color: var(--red); }
+.sensor-row.closed .sensor-state { color: var(--green); }
+
+.sensor-time {
+  font-size: 11px;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+  flex-shrink: 0;
+  min-width: 44px;
+  text-align: right;
+  opacity: 0.6;
+}
+
+/* 2-column layout for right panel */
+.sensor-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 12px;
+  flex: 1;
+}
+
+.sensor-col { display: flex; flex-direction: column; }
+
+/* STATUS FOOTER */
+.status-footer {
+  position: absolute;
+  bottom: 5px;
+  right: 10px;
+  font-size: 11px;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.device-label {
+  text-align: center;
+  color: #aaa;
+  font-size: 11px;
+  padding: 4px 0 0;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+
+<div style="display:flex;flex-direction:column;gap:8px">
+  <div style="text-align:center;color:#999;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px">
+    KITCHEN PANEL — SCREEN 4 — SECURITY — 800×480 — E INK SPECTRA 6
+  </div>
+
+  <div class="device-frame">
+    <div class="screen">
+
+      <!-- ═══ LEFT BAR ═══ -->
+      <div class="left-bar">
+
+        <!-- Alarm state -->
+        <div class="alarm-armed">
+          <div class="alarm-icon-wrap">
+            <span class="mdi mdi-shield-lock"></span>
+            <span class="alarm-state-text">Armed Away</span>
+          </div>
+        </div>
+        <div class="alarm-since">since 08:47</div>
+
+        <div class="left-divider"></div>
+
+        <!-- Summary counts -->
+        <div class="summary-row">
+          <span class="mdi mdi-door"></span>
+          <span class="summary-count">4</span>
+          <span class="summary-label">doors — all closed</span>
+        </div>
+        <div class="summary-row has-alert">
+          <span class="mdi mdi-window-open"></span>
+          <span class="summary-count">1</span>
+          <span class="summary-label">window open</span>
+        </div>
+        <div class="summary-row">
+          <span class="mdi mdi-motion-sensor"></span>
+          <span class="summary-count">6</span>
+          <span class="summary-label">motion sensors</span>
+        </div>
+        <div class="summary-row">
+          <span class="mdi mdi-cctv"></span>
+          <span class="summary-count">3</span>
+          <span class="summary-label">cameras</span>
+        </div>
+
+        <div class="left-divider"></div>
+
+        <!-- Alarm history -->
+        <div class="history-block">
+          <div class="history-row">
+            <span class="history-label">Last Armed</span>
+            <span class="history-value">08:47 today</span>
+          </div>
+          <div class="history-row">
+            <span class="history-label">Last Disarmed</span>
+            <span class="history-value">07:12 today</span>
+          </div>
+          <div class="history-row">
+            <span class="history-label">Last Triggered</span>
+            <span class="history-value">3 days ago</span>
+          </div>
+        </div>
+
+      </div><!-- /left-bar -->
+
+      <!-- ═══ RIGHT PANEL ═══ -->
+      <div class="right-panel">
+
+        <div class="sensor-columns">
+
+          <!-- LEFT COLUMN -->
+          <div class="sensor-col">
+
+            <div class="section-header">Doors</div>
+
+            <div class="sensor-row closed">
+              <span class="mdi mdi-door sensor-icon"></span>
+              <span class="sensor-name">Front door</span>
+              <span class="sensor-state">Closed</span>
+              <span class="sensor-time">08:47</span>
+            </div>
+            <div class="sensor-row closed">
+              <span class="mdi mdi-door sensor-icon"></span>
+              <span class="sensor-name">Back door</span>
+              <span class="sensor-state">Closed</span>
+              <span class="sensor-time">07:30</span>
+            </div>
+            <div class="sensor-row closed">
+              <span class="mdi mdi-door sensor-icon"></span>
+              <span class="sensor-name">Garage</span>
+              <span class="sensor-state">Closed</span>
+              <span class="sensor-time">08:20</span>
+            </div>
+            <div class="sensor-row closed">
+              <span class="mdi mdi-door sensor-icon"></span>
+              <span class="sensor-name">Side gate</span>
+              <span class="sensor-state">Closed</span>
+              <span class="sensor-time">yesterday</span>
+            </div>
+
+            <div class="section-header" style="margin-top:8px">Windows</div>
+
+            <div class="sensor-row open">
+              <span class="mdi mdi-window-open sensor-icon"></span>
+              <span class="sensor-name">Kitchen</span>
+              <span class="sensor-state">Open</span>
+              <span class="sensor-time">14:21</span>
+            </div>
+            <div class="sensor-row closed">
+              <span class="mdi mdi-window-closed sensor-icon"></span>
+              <span class="sensor-name">Living room</span>
+              <span class="sensor-state">Closed</span>
+              <span class="sensor-time">08:47</span>
+            </div>
+            <div class="sensor-row closed">
+              <span class="mdi mdi-window-closed sensor-icon"></span>
+              <span class="sensor-name">Main bed</span>
+              <span class="sensor-state">Closed</span>
+              <span class="sensor-time">08:47</span>
+            </div>
+
+          </div><!-- /left col -->
+
+          <!-- RIGHT COLUMN -->
+          <div class="sensor-col">
+
+            <div class="section-header">Motion</div>
+
+            <div class="sensor-row motion">
+              <span class="mdi mdi-motion-sensor sensor-icon"></span>
+              <span class="sensor-name">Living room</span>
+              <span class="sensor-time" style="min-width:unset">14:32</span>
+            </div>
+            <div class="sensor-row motion">
+              <span class="mdi mdi-motion-sensor sensor-icon"></span>
+              <span class="sensor-name">Kitchen</span>
+              <span class="sensor-time" style="min-width:unset">14:28</span>
+            </div>
+            <div class="sensor-row no-motion">
+              <span class="mdi mdi-motion-sensor sensor-icon"></span>
+              <span class="sensor-name">Hall</span>
+              <span class="sensor-time" style="min-width:unset">09:14</span>
+            </div>
+            <div class="sensor-row no-motion">
+              <span class="mdi mdi-motion-sensor sensor-icon"></span>
+              <span class="sensor-name">Main bed</span>
+              <span class="sensor-time" style="min-width:unset">08:02</span>
+            </div>
+            <div class="sensor-row no-motion">
+              <span class="mdi mdi-motion-sensor sensor-icon"></span>
+              <span class="sensor-name">Office</span>
+              <span class="sensor-time" style="min-width:unset">07:45</span>
+            </div>
+            <div class="sensor-row no-motion">
+              <span class="mdi mdi-motion-sensor sensor-icon"></span>
+              <span class="sensor-name">Garden</span>
+              <span class="sensor-time" style="min-width:unset">06:30</span>
+            </div>
+
+            <div class="section-header" style="margin-top:8px">Cameras</div>
+
+            <div class="sensor-row cam-motion">
+              <span class="mdi mdi-cctv sensor-icon"></span>
+              <span class="sensor-name">Front</span>
+              <span class="sensor-time" style="min-width:unset">13:45</span>
+            </div>
+            <div class="sensor-row cam-motion">
+              <span class="mdi mdi-cctv sensor-icon"></span>
+              <span class="sensor-name">Driveway</span>
+              <span class="sensor-time" style="min-width:unset">11:02</span>
+            </div>
+            <div class="sensor-row cam-clear">
+              <span class="mdi mdi-cctv sensor-icon"></span>
+              <span class="sensor-name">Garden</span>
+              <span class="sensor-time" style="min-width:unset">—</span>
+            </div>
+
+          </div><!-- /right col -->
+
+        </div><!-- /sensor-columns -->
+
+        <!-- Footer -->
+        <div class="status-footer">
+          <span class="mdi mdi-clock-outline"></span>
+          <span>updated 14:32</span>
+          <span>·</span>
+          <span class="mdi mdi-battery-80"></span>
+          <span>87%</span>
+        </div>
+
+      </div><!-- /right-panel -->
+
+    </div><!-- /screen -->
+    <div class="device-label">reTerminal E1002 · 800×480 · E Ink Spectra 6 · Screen 4 — Security</div>
+  </div>
+
+  <div style="display:flex;gap:16px;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;color:#888;flex-wrap:wrap;margin-top:4px">
+    <span style="color:#c0392b">■ Red — open / alert</span>
+    <span style="color:#2e7d32">■ Green — closed / secure</span>
+    <span style="color:#1a5fa8">■ Blue — recent motion</span>
+    <span style="color:#1a1a1a">■ Black — no recent motion</span>
+  </div>
+</div>
+
+</body>
+</html>

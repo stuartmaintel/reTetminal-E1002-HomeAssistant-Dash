@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=800, initial-scale=1.0">
+<title>Kitchen Panel — Screen 1 Mockup</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.2.96/css/materialdesignicons.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=DM+Mono:wght@500&display=swap');
+
+  /* E-ink Spectra 6 palette only: black, white, red, yellow, blue, green */
+  :root {
+    --black:   #1a1a1a;
+    --white:   #f0ede8;
+    --red:     #c0392b;
+    --yellow:  #e6b800;
+    --blue:    #1a5fa8;
+    --green:   #2e7d32;
+    --grey:    #1a1a1a;   /* inactive = black on Spectra 6 — no true grey */
+    --divider: #888888;
+    --bg:      #f0ede8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #d0ccc5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+  }
+
+  .device-frame {
+    width: 820px;
+    background: #555;
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+
+  .screen {
+    width: 800px;
+    height: 480px;
+    background: var(--bg);
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #ccc;
+  }
+
+  /* ── LEFT BAR ─────────────────────────────────── */
+  .left-bar {
+    width: 240px;
+    height: 480px;
+    border-right: 2px solid var(--black);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  /* WEATHER ZONE — fixed height 175px */
+  .weather-zone {
+    padding: 10px 12px 6px;
+    height: 175px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .weather-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .weather-temp {
+    font-size: 68px;
+    font-weight: bold;
+    color: var(--black);
+    line-height: 1;
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+  }
+
+  .weather-icon {
+    font-size: 68px;
+    color: var(--yellow);
+  }
+
+  .weather-sub {
+    font-size: 13px;
+    color: var(--black);
+    display: flex;
+    gap: 0;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    padding: 0 2px;
+  }
+
+  .weather-sub-item {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .weather-sub-item .mdi { font-size: 14px; }
+  .weather-sub-item .mdi-thermometer-low  { color: var(--blue); }
+  .weather-sub-item .mdi-water-percent    { color: var(--blue); }
+  .weather-sub-item .mdi-weather-windy    { color: var(--black); }
+  .weather-sub-item .mdi-air-filter       { color: var(--green); }
+
+  .weather-sub-item span {
+    font-size: 13px;
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+  }
+
+  .forecast-row {
+    display: flex;
+    gap: 4px;
+  }
+
+  .forecast-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+  }
+
+  .forecast-label {
+    font-size: 10px;
+    color: var(--black);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .forecast-icon { font-size: 20px; }
+  .forecast-temp { font-size: 12px; color: var(--black); font-weight: bold; }
+
+  /* SOLAR ZONE — natural height, centred in remaining flex space */
+  .solar-spacer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .solar-zone {
+    padding: 0 10px;
+    width: 100%;
+  }
+
+  .solar-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 3px;
+    height: 140px;
+  }
+
+  .solar-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    border: 1px solid #ccc;
+    padding: 3px;
+  }
+
+  .solar-cell .mdi { font-size: 24px; }
+  .solar-cell .val { font-size: 18px; font-weight: bold; color: var(--black); line-height: 1; }
+  .solar-cell .sub { font-size: 9px; color: var(--grey); text-align: center; line-height: 1.2; }
+
+  .cell-generation .mdi { color: var(--yellow); }
+  .cell-load .mdi       { color: var(--black); }
+  .cell-export .mdi     { color: var(--green); }
+  .cell-import .mdi     { color: var(--red); }
+
+  /* BATTERY ZONE — fixed height, pinned to bottom */
+  .battery-zone {
+    padding: 8px 12px 12px;
+    height: 90px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  .battery-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .battery-left {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .battery-icon { font-size: 28px; color: var(--green); }
+  .battery-pct  { font-size: 26px; font-weight: bold; color: var(--black); }
+
+  .battery-eta {
+    font-size: 11px;
+    color: var(--black);
+    text-align: right;
+    line-height: 1.3;
+  }
+
+  .battery-status {
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--green);
+    text-align: right;
+  }
+
+  .battery-bar-wrap {
+    width: 100%;
+    height: 22px;
+    border: 2px solid var(--black);
+    padding: 2px;
+    background: var(--white);
+  }
+
+  .battery-bar-fill {
+    height: 100%;
+    background: var(--green);
+    width: 87%;
+  }
+
+  /* ── RIGHT PANEL ──────────────────────────────── */
+  .right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 480px;
+  }
+
+  /* ICON BAR */
+  .icon-bar {
+    height: 44px;
+    border-bottom: 1px solid var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 16px;
+    flex-shrink: 0;
+  }
+
+  .icon-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+    position: relative;
+  }
+
+  .icon-slot .mdi { font-size: 26px; }
+  .icon-slot.inactive .mdi { color: var(--grey); }
+  .icon-slot.active-red    .mdi { color: var(--red); }
+  .icon-slot.active-green  .mdi { color: var(--green); }
+  .icon-slot.active-blue   .mdi { color: var(--blue); }
+  .icon-slot.active-yellow .mdi { color: var(--yellow); }
+
+  /* DETAIL AREA */
+  .detail-area {
+    flex: 1;
+    padding: 8px 14px 0 14px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .detail-section-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black);
+    margin-bottom: 4px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .alert-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    color: var(--black);
+    padding: 5px 8px;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    border-left: 5px solid var(--black);
+  }
+
+  .alert-line .mdi { font-size: 17px; flex-shrink: 0; }
+  .alert-line.alert-red    { border-left-color: var(--red);    }
+  .alert-line.alert-red    .mdi { color: var(--red);    }
+  .alert-line.alert-green  { border-left-color: var(--green);  }
+  .alert-line.alert-green  .mdi { color: var(--green);  }
+  .alert-line.alert-blue   { border-left-color: var(--blue);   }
+  .alert-line.alert-blue   .mdi { color: var(--blue);   }
+  .alert-line.alert-yellow { border-left-color: var(--yellow); }
+  .alert-line.alert-yellow .mdi { color: var(--yellow); }
+
+  .all-clear {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    color: var(--green);
+    padding: 5px 8px;
+    border-left: 5px solid var(--green);
+    margin-bottom: 4px;
+  }
+
+  .section-gap { height: 8px; }
+
+  .calendar-section { display: flex; flex-direction: column; gap: 4px; }
+
+  .calendar-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    color: var(--black);
+    padding: 5px 8px;
+    border-left: 5px solid var(--blue);
+  }
+
+  .calendar-line .mdi { font-size: 15px; color: var(--blue); flex-shrink: 0; }
+
+  .cal-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    min-width: 38px;
+    color: var(--black);
+  }
+
+  /* STATUS FOOTER */
+  .status-footer {
+    position: absolute;
+    bottom: 6px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--grey);
+  }
+
+  .status-footer .mdi { font-size: 12px; color: var(--grey); }
+
+  /* LABEL */
+  .device-label {
+    text-align: center;
+    color: #aaa;
+    font-size: 11px;
+    padding: 4px 0 0;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<div style="display:flex;flex-direction:column;gap:8px">
+  <div style="text-align:center;color:#999;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px">
+    KITCHEN PANEL — SCREEN 1 MOCKUP — 800×480 — E INK SPECTRA 6
+  </div>
+
+  <div class="device-frame">
+    <div class="screen">
+
+      <!-- ═══ LEFT BAR ═══ -->
+      <div class="left-bar">
+
+        <!-- WEATHER -->
+        <div class="weather-zone">
+          <div class="weather-main">
+            <span class="weather-temp">18°</span>
+            <span class="mdi mdi-weather-partly-cloudy weather-icon"></span>
+          </div>
+          <div class="weather-sub">
+            <div class="weather-sub-item">
+              <span class="mdi mdi-thermometer-low"></span>
+              <span>16°</span>
+            </div>
+            <div class="weather-sub-item">
+              <span class="mdi mdi-water-percent"></span>
+              <span>65%</span>
+            </div>
+            <div class="weather-sub-item">
+              <span class="mdi mdi-weather-windy"></span>
+              <span>12</span>
+            </div>
+            <div class="weather-sub-item">
+              <span class="mdi mdi-air-filter" style="color:var(--green)"></span>
+              <span>24</span>
+            </div>
+          </div>
+          <div class="forecast-row">
+            <div class="forecast-col">
+              <span class="forecast-label">Later</span>
+              <span class="mdi mdi-weather-cloudy forecast-icon" style="color:var(--grey)"></span>
+              <span class="forecast-temp">14°</span>
+            </div>
+            <div class="forecast-col">
+              <span class="forecast-label">Thu</span>
+              <span class="mdi mdi-weather-rainy forecast-icon" style="color:var(--blue)"></span>
+              <span class="forecast-temp">15°</span>
+            </div>
+            <div class="forecast-col">
+              <span class="forecast-label">Fri</span>
+              <span class="mdi mdi-weather-sunny forecast-icon" style="color:var(--yellow)"></span>
+              <span class="forecast-temp">20°</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOLAR 2×2 — centred in remaining space -->
+        <div class="solar-spacer">
+          <div class="solar-zone">
+            <div class="solar-grid">
+              <div class="solar-cell cell-generation">
+                <span class="mdi mdi-solar-power-variant"></span>
+                <span class="val">47.2</span>
+                <span class="sub">of 52 kWh exp.</span>
+              </div>
+              <div class="solar-cell cell-load">
+                <span class="mdi mdi-home-lightning-bolt"></span>
+                <span class="val">8.3</span>
+                <span class="sub">kWh load</span>
+              </div>
+              <div class="solar-cell cell-export">
+                <span class="mdi mdi-transmission-tower-export"></span>
+                <span class="val">2.1</span>
+                <span class="sub">kWh export</span>
+              </div>
+              <div class="solar-cell cell-import">
+                <span class="mdi mdi-transmission-tower-import"></span>
+                <span class="val">1.4</span>
+                <span class="sub">kWh import</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BATTERY -->
+        <div class="battery-zone">
+          <div class="battery-header">
+            <div class="battery-left">
+              <span class="mdi mdi-battery-80 battery-icon"></span>
+              <span class="battery-pct">87%</span>
+            </div>
+            <div>
+              <div class="battery-status">Charging</div>
+              <div class="battery-eta">Full at 14:30</div>
+            </div>
+          </div>
+          <div class="battery-bar-wrap">
+            <div class="battery-bar-fill"></div>
+          </div>
+        </div>
+
+      </div><!-- /left-bar -->
+
+      <!-- ═══ RIGHT PANEL ═══ -->
+      <div class="right-panel">
+
+        <!-- ICON BAR -->
+        <div class="icon-bar">
+          <!-- Alarm: green = disarmed -->
+          <div class="icon-slot active-green" title="Alarm: Disarmed">
+            <span class="mdi mdi-shield-home"></span>
+          </div>
+          <!-- Doors: red = open -->
+          <div class="icon-slot active-red" title="Door: Open">
+            <span class="mdi mdi-door-open"></span>
+          </div>
+          <!-- Windows: grey = all closed -->
+          <div class="icon-slot inactive" title="Windows: All closed">
+            <span class="mdi mdi-window-closed"></span>
+          </div>
+          <!-- Plants: red = due -->
+          <div class="icon-slot active-red" title="Plants: Due watering">
+            <span class="mdi mdi-flower"></span>
+          </div>
+          <!-- Heating: grey = idle -->
+          <div class="icon-slot inactive" title="Heating: Idle">
+            <span class="mdi mdi-radiator"></span>
+          </div>
+          <!-- Hot water: red = active -->
+          <div class="icon-slot active-red" title="Hot water: Heating">
+            <span class="mdi mdi-water-boiler"></span>
+          </div>
+          <!-- Vacuum 1: green = running -->
+          <div class="icon-slot active-green" title="Vacuum 1: Running">
+            <span class="mdi mdi-robot-vacuum"></span>
+          </div>
+          <!-- Vacuum 2: blue = scheduled -->
+          <div class="icon-slot active-blue" title="Vacuum 2: Scheduled today">
+            <span class="mdi mdi-robot-vacuum-variant"></span>
+          </div>
+          <!-- Mower: grey = inactive -->
+          <div class="icon-slot inactive" title="Mower: Inactive">
+            <span class="mdi mdi-robot-mower"></span>
+          </div>
+        </div>
+
+        <!-- DETAIL AREA -->
+        <div class="detail-area">
+
+          <!-- Active alerts -->
+          <div class="detail-section-label">Status</div>
+          <div class="alert-line alert-red">
+            <span class="mdi mdi-door-open"></span>
+            <span>Front door open</span>
+          </div>
+          <div class="alert-line alert-red">
+            <span class="mdi mdi-flower"></span>
+            <span>Pothos due watering</span>
+          </div>
+          <div class="alert-line alert-red">
+            <span class="mdi mdi-water-boiler"></span>
+            <span>Hot water heating</span>
+          </div>
+          <div class="alert-line alert-green">
+            <span class="mdi mdi-robot-vacuum"></span>
+            <span>Vacuum 1 running — Kitchen</span>
+          </div>
+
+          <!-- Thin separator -->
+          <div class="section-gap"></div>
+
+          <!-- Calendar events -->
+          <div class="detail-section-label">Today</div>
+          <div class="calendar-section">
+            <div class="calendar-line">
+              <span class="mdi mdi-robot-vacuum-variant"></span>
+              <span class="cal-time">14:00</span>
+              <span>Vacuum 2 scheduled</span>
+            </div>
+            <div class="calendar-line">
+              <span class="mdi mdi-delete-empty"></span>
+              <span class="cal-time">—</span>
+              <span>Bin collection today</span>
+            </div>
+            <div class="calendar-line">
+              <span class="mdi mdi-calendar"></span>
+              <span class="cal-time">17:30</span>
+              <span>School pickup</span>
+            </div>
+          </div>
+
+          <!-- Smart footer: time + battery (colored) + temp warning -->
+          <div class="status-footer">
+            <!-- Temp warning — only shown when out of range -->
+            <span class="mdi mdi-thermometer" style="color:var(--red);font-size:13px"></span>
+            <span style="color:var(--red);font-size:11px;font-family:'DM Mono',monospace">8°</span>
+            <span style="margin:0 3px;font-size:11px;color:var(--black)">·</span>
+            <!-- Battery — red when critical -->
+            <span class="mdi mdi-battery-alert" style="color:var(--red);font-size:13px"></span>
+            <span style="color:var(--red);font-size:11px;font-family:'DM Mono',monospace">8%</span>
+            <span style="margin:0 3px;font-size:11px;color:var(--black)">·</span>
+            <!-- Normal state examples -->
+            <span class="mdi mdi-clock-outline" style="font-size:12px"></span>
+            <span style="font-size:11px;font-family:'DM Mono',monospace">updated 14:32</span>
+            <span style="margin:0 3px;font-size:11px;color:var(--black)">·</span>
+            <span class="mdi mdi-battery-80" style="color:var(--green);font-size:13px"></span>
+            <span style="color:var(--green);font-size:11px;font-family:'DM Mono',monospace">87%</span>
+          </div>
+          <!-- Note: above shows ALL states for mockup. On device only active warnings show. -->
+
+        </div><!-- /detail-area -->
+
+      </div><!-- /right-panel -->
+
+    </div><!-- /screen -->
+    <div class="device-label">reTerminal E1002 · 800×480 · E Ink Spectra 6</div>
+  </div><!-- /device-frame -->
+
+  <!-- LEGEND -->
+  <div style="display:flex;gap:16px;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;color:#888;flex-wrap:wrap">
+    <span style="color:#2e7d32">■ Green — safe/charging/running</span>
+    <span style="color:#c0392b">■ Red — alert/armed/due</span>
+    <span style="color:#1a5fa8">■ Blue — scheduled/humidity</span>
+    <span style="color:#e6b800">■ Yellow — solar/discharging</span>
+    <span style="color:#1a1a1a">■ Black — inactive</span>
+  </div>
+</div>
+
+</body>
+</html>

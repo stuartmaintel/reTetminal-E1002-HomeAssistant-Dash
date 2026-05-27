@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=800, initial-scale=1.0">
+<title>Kitchen Panel — Screen 2 Mockup</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.2.96/css/materialdesignicons.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=DM+Mono:wght@500&display=swap');
+
+  :root {
+    --black:   #1a1a1a;
+    --white:   #f0ede8;
+    --red:     #c0392b;
+    --yellow:  #e6b800;
+    --blue:    #1a5fa8;
+    --green:   #2e7d32;
+    --grey:    #1a1a1a;
+    --divider: #888888;
+    --bg:      #f0ede8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #d0ccc5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+  }
+  .device-frame {
+    width: 820px;
+    background: #555;
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .screen {
+    width: 800px;
+    height: 480px;
+    background: var(--bg);
+    display: flex;
+    overflow: hidden;
+    border: 1px solid #ccc;
+  }
+
+  /* ── LEFT BAR — ROOM TEMPS ── */
+  .left-bar {
+    width: 240px;
+    height: 480px;
+    border-right: 2px solid var(--black);
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    gap: 0px;
+    flex-shrink: 0;
+  }
+
+  .floor-label {
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 4px;
+    margin-top: 6px;
+  }
+  .floor-label:first-child { margin-top: 0; }
+
+  .room-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+  }
+  .room-row:last-of-type { border-bottom: none; }
+
+  .room-icon { font-size: 20px; color: var(--black); flex-shrink: 0; }
+  .room-icon.heating { color: var(--red); }
+
+  .room-name {
+    flex: 1;
+    font-size: 14px;
+    color: var(--black);
+  }
+
+  .room-readings {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+  }
+
+  .room-temp {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--black);
+    line-height: 1;
+  }
+
+  .room-humid {
+    font-size: 11px;
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .room-humid .mdi { font-size: 10px; }
+
+  .floor-divider {
+    width: 100%;
+    height: 1px;
+    background: var(--black);
+    margin: 6px 0;
+  }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 480px;
+    padding: 12px 16px;
+    gap: 0;
+  }
+
+  .section-header {
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 8px;
+  }
+
+  /* PRESENCE */
+  .presence-section { margin-bottom: 14px; }
+
+  .presence-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .person-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .person-icon { font-size: 32px; }
+  .person-icon.home  { color: var(--green); }
+  .person-icon.away  { color: var(--black); opacity: 0.25; } /* faded black = not home */
+
+  .person-name {
+    font-size: 11px;
+    color: var(--black);
+    text-align: center;
+  }
+
+  /* MEDIA */
+  .media-section {
+    margin-bottom: 14px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+  }
+
+  .media-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+  }
+
+  .media-icon { font-size: 22px; color: var(--blue); flex-shrink: 0; }
+
+  .media-detail { flex: 1; }
+  .media-room   { font-size: 11px; color: var(--grey); line-height: 1; }
+  .media-title  { font-size: 15px; color: var(--black); line-height: 1.3; font-weight: bold; }
+  .media-artist { font-size: 12px; color: var(--black); line-height: 1.2; }
+
+  /* TRANSPORT */
+  .transport-section {
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    flex: 1;
+  }
+
+  .transport-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+  }
+  .transport-row:last-child { border-bottom: none; }
+
+  .transport-icon { font-size: 22px; flex-shrink: 0; }
+  .transport-icon.bus   { color: var(--green); }
+  .transport-icon.train { color: var(--blue); }
+  .transport-icon.tram  { color: var(--yellow); }
+
+  .transport-route {
+    flex: 1;
+  }
+  .route-name   { font-size: 15px; font-weight: bold; color: var(--black); }
+  .route-dest   { font-size: 11px; color: var(--grey); }
+
+  .departure-times {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .dep-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 44px;
+  }
+
+  .dep-clock { font-size: 17px; font-weight: bold; color: var(--black); line-height: 1; }
+  .dep-mins  { font-size: 11px; color: var(--green); }
+  .dep-mins.soon { color: var(--red); }
+
+  /* STATUS FOOTER */
+  .status-footer {
+    position: absolute;
+    bottom: 6px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--grey);
+  }
+  .right-panel { position: relative; }
+
+  .device-label {
+    text-align: center;
+    color: #aaa;
+    font-size: 11px;
+    padding: 4px 0 0;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<div style="display:flex;flex-direction:column;gap:8px">
+  <div style="text-align:center;color:#999;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px">
+    KITCHEN PANEL — SCREEN 3 — 800×480 — E INK SPECTRA 6
+  </div>
+
+  <div class="device-frame">
+    <div class="screen">
+
+      <!-- ═══ LEFT BAR — ROOM TEMPS ═══ -->
+      <div class="left-bar">
+
+        <div class="floor-label">Upstairs</div>
+
+        <div class="room-row">
+          <span class="mdi mdi-bed room-icon"></span>
+          <span class="room-name">Main Bed</span>
+          <div class="room-readings">
+            <span class="room-temp">21°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>58%</span>
+          </div>
+        </div>
+
+        <div class="room-row">
+          <span class="mdi mdi-bed room-icon"></span>
+          <span class="room-name">Guest</span>
+          <div class="room-readings">
+            <span class="room-temp">19°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>52%</span>
+          </div>
+        </div>
+
+        <div class="room-row">
+          <span class="mdi mdi-shower room-icon"></span>
+          <span class="room-name">Bathroom</span>
+          <div class="room-readings">
+            <span class="room-temp">22°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>71%</span>
+          </div>
+        </div>
+
+        <div class="room-row">
+          <span class="mdi mdi-desk room-icon"></span>
+          <span class="room-name">Office</span>
+          <div class="room-readings">
+            <span class="room-temp">20°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>55%</span>
+          </div>
+        </div>
+
+        <div class="floor-divider"></div>
+        <div class="floor-label">Downstairs</div>
+
+        <div class="room-row">
+          <span class="mdi mdi-sofa room-icon heating"></span>
+          <span class="room-name">Living</span>
+          <div class="room-readings">
+            <span class="room-temp">20°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>55%</span>
+          </div>
+        </div>
+
+        <div class="room-row">
+          <span class="mdi mdi-chef-hat room-icon"></span>
+          <span class="room-name">Kitchen</span>
+          <div class="room-readings">
+            <span class="room-temp">19°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>60%</span>
+          </div>
+        </div>
+
+        <div class="room-row">
+          <span class="mdi mdi-door room-icon"></span>
+          <span class="room-name">Hall</span>
+          <div class="room-readings">
+            <span class="room-temp">17°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>50%</span>
+          </div>
+        </div>
+
+      </div><!-- /left-bar -->
+
+      <!-- ═══ RIGHT PANEL ═══ -->
+      <div class="right-panel">
+
+        <!-- PRESENCE -->
+        <div class="presence-section">
+          <div class="section-header">Presence</div>
+          <div class="presence-row">
+            <div class="person-slot">
+              <span class="mdi mdi-account-circle person-icon home"></span>
+              <span class="person-name">Alex</span>
+            </div>
+            <div class="person-slot">
+              <span class="mdi mdi-account-circle person-icon home"></span>
+              <span class="person-name">Sam</span>
+            </div>
+            <div class="person-slot">
+              <span class="mdi mdi-account-circle person-icon away"></span>
+              <span class="person-name">Jamie</span>
+            </div>
+            <div class="person-slot">
+              <span class="mdi mdi-account-circle person-icon away"></span>
+              <span class="person-name">Riley</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MEDIA -->
+        <div class="media-section">
+          <div class="section-header">Now Playing</div>
+
+          <div class="media-row">
+            <span class="mdi mdi-music media-icon"></span>
+            <div class="media-detail">
+              <div class="media-room">Bedroom · Spotify</div>
+              <div class="media-title">Comptine d'un autre été</div>
+              <div class="media-artist">Yann Tiersen</div>
+            </div>
+          </div>
+
+          <div class="media-row">
+            <span class="mdi mdi-television-play media-icon"></span>
+            <div class="media-detail">
+              <div class="media-room">Living Room · Netflix</div>
+              <div class="media-title">The Bear — S03E04</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TRANSPORT -->
+        <div class="transport-section">
+          <div class="section-header">Next Departures</div>
+
+          <div class="transport-row">
+            <span class="mdi mdi-bus transport-icon bus"></span>
+            <div class="transport-route">
+              <div class="route-name">42 · City Centre</div>
+              <div class="route-dest">High Street stop</div>
+            </div>
+            <div class="departure-times">
+              <div class="dep-time">
+                <span class="dep-clock">12:34</span>
+                <span class="dep-mins soon">3 min</span>
+              </div>
+              <div class="dep-time">
+                <span class="dep-clock">12:51</span>
+                <span class="dep-mins">20 min</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="transport-row">
+            <span class="mdi mdi-train transport-icon train"></span>
+            <div class="transport-route">
+              <div class="route-name">Overground · Waterloo</div>
+              <div class="route-dest">Central Station</div>
+            </div>
+            <div class="departure-times">
+              <div class="dep-time">
+                <span class="dep-clock">12:40</span>
+                <span class="dep-mins">9 min</span>
+              </div>
+              <div class="dep-time">
+                <span class="dep-clock">13:10</span>
+                <span class="dep-mins">39 min</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="transport-row">
+            <span class="mdi mdi-bus transport-icon bus"></span>
+            <div class="transport-route">
+              <div class="route-name">7 · Airport</div>
+              <div class="route-dest">High Street stop</div>
+            </div>
+            <div class="departure-times">
+              <div class="dep-time">
+                <span class="dep-clock">13:02</span>
+                <span class="dep-mins">31 min</span>
+              </div>
+              <div class="dep-time">
+                <span class="dep-clock">13:18</span>
+                <span class="dep-mins">47 min</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- STATUS FOOTER -->
+        <div class="status-footer">
+          <span class="mdi mdi-clock-outline"></span>
+          <span>updated 14:32</span>
+          <span style="margin:0 2px">·</span>
+          <span class="mdi mdi-battery-80"></span>
+          <span>87%</span>
+        </div>
+
+      </div><!-- /right-panel -->
+
+    </div><!-- /screen -->
+    <div class="device-label">reTerminal E1002 · 800×480 · E Ink Spectra 6 · Screen 2</div>
+  </div>
+
+  <div style="display:flex;gap:16px;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;color:#888;flex-wrap:wrap">
+    <span style="color:#2e7d32">■ Green — home / bus / good</span>
+    <span style="color:#c0392b">■ Red — imminent departure / heating</span>
+    <span style="color:#1a5fa8">■ Blue — train / humidity / media</span>
+    <span style="color:#aaa">■ Grey — away / inactive</span>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=800, initial-scale=1.0">
+<title>Kitchen Panel — Config Screen States</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.2.96/css/materialdesignicons.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=DM+Mono:wght@500&display=swap');
+
+:root {
+  --black:  #1a1a1a;
+  --white:  #f0ede8;
+  --red:    #c0392b;
+  --yellow: #e6b800;
+  --blue:   #1a5fa8;
+  --green:  #2e7d32;
+  --bg:     #f0ede8;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: #d0ccc5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 24px;
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+  padding: 24px 0;
+}
+
+.label {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #999;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.device-frame {
+  width: 820px;
+  background: #555;
+  border-radius: 6px;
+  padding: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.screen {
+  width: 800px;
+  height: 480px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  position: relative;
+}
+
+/* ── SHARED ── */
+.screen-title {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  padding: 14px 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.screen-subtitle {
+  font-size: 14px;
+  text-align: center;
+  color: var(--black);
+  padding-bottom: 12px;
+  font-family: 'DM Mono', monospace;
+}
+
+.content-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  padding: 0 40px 10px;
+}
+
+/* ── QR ── */
+.qr-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.qr-box {
+  width: 160px;
+  height: 160px;
+  background: white;
+  border: 3px solid var(--black);
+  padding: 8px;
+}
+
+.qr-label {
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  color: var(--black);
+  text-align: center;
+  max-width: 160px;
+  word-break: break-all;
+}
+
+/* ── INSTRUCTIONS ── */
+.instructions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 320px;
+}
+
+.instr-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.instr-row .mdi {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.instr-text { font-size: 15px; line-height: 1.4; }
+.instr-value { font-size: 16px; font-weight: 700; }
+
+/* ── STATUS FOOTER ── */
+.status-bar {
+  border-top: 1px solid var(--black);
+  padding: 4px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  background: var(--white);
+}
+
+.status-item {
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  color: var(--black);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.status-item .mdi { font-size: 11px; }
+.status-item .val { font-weight: 700; }
+.status-item .val.ok { color: var(--green); }
+.status-item .val.warn { color: var(--yellow); }
+
+.device-label {
+  text-align: center;
+  color: #aaa;
+  font-size: 11px;
+  padding: 4px 0 0;
+  font-family: monospace;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ STATE 1: AP MODE ═══ -->
+<div class="label">State 1 — No WiFi / First Boot — AP Mode</div>
+<div class="device-frame">
+  <div class="screen">
+
+    <div class="screen-title" style="color:var(--blue)">
+      <span class="mdi mdi-wifi-plus" style="font-size:32px"></span>
+      WiFi Setup
+    </div>
+    <div class="screen-subtitle">
+      Scan to connect your phone, then open the config page
+    </div>
+
+    <div class="content-area">
+
+      <!-- WiFi QR code -->
+      <div class="qr-wrap">
+        <div class="qr-box">
+          <svg width="100%" height="100%" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+            <!-- Finder TL -->
+            <rect x="0" y="0" width="7" height="7" fill="#1a1a1a"/>
+            <rect x="1" y="1" width="5" height="5" fill="#f0ede8"/>
+            <rect x="2" y="2" width="3" height="3" fill="#1a1a1a"/>
+            <!-- Finder TR -->
+            <rect x="14" y="0" width="7" height="7" fill="#1a1a1a"/>
+            <rect x="15" y="1" width="5" height="5" fill="#f0ede8"/>
+            <rect x="16" y="2" width="3" height="3" fill="#1a1a1a"/>
+            <!-- Finder BL -->
+            <rect x="0" y="14" width="7" height="7" fill="#1a1a1a"/>
+            <rect x="1" y="15" width="5" height="5" fill="#f0ede8"/>
+            <rect x="2" y="16" width="3" height="3" fill="#1a1a1a"/>
+            <!-- Timing -->
+            <rect x="8" y="6" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="10" y="6" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="12" y="6" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="6" y="8" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="6" y="10" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="6" y="12" width="1" height="1" fill="#1a1a1a"/>
+            <!-- Data modules -->
+            <rect x="8" y="8" width="2" height="1" fill="#1a1a1a"/>
+            <rect x="11" y="8" width="2" height="1" fill="#1a1a1a"/>
+            <rect x="8" y="10" width="1" height="2" fill="#1a1a1a"/>
+            <rect x="11" y="10" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="13" y="9" width="1" height="2" fill="#1a1a1a"/>
+            <rect x="9" y="12" width="2" height="1" fill="#1a1a1a"/>
+            <rect x="12" y="11" width="2" height="2" fill="#1a1a1a"/>
+            <rect x="15" y="8" width="1" height="3" fill="#1a1a1a"/>
+            <rect x="17" y="8" width="2" height="1" fill="#1a1a1a"/>
+            <rect x="17" y="10" width="1" height="2" fill="#1a1a1a"/>
+            <rect x="19" y="9" width="1" height="3" fill="#1a1a1a"/>
+            <rect x="16" y="12" width="2" height="1" fill="#1a1a1a"/>
+            <rect x="8" y="15" width="2" height="2" fill="#1a1a1a"/>
+            <rect x="11" y="14" width="1" height="3" fill="#1a1a1a"/>
+            <rect x="13" y="15" width="2" height="1" fill="#1a1a1a"/>
+            <rect x="9" y="18" width="3" height="1" fill="#1a1a1a"/>
+            <rect x="13" y="17" width="1" height="3" fill="#1a1a1a"/>
+            <rect x="15" y="14" width="3" height="2" fill="#1a1a1a"/>
+            <rect x="19" y="14" width="2" height="3" fill="#1a1a1a"/>
+            <rect x="16" y="17" width="2" height="2" fill="#1a1a1a"/>
+          </svg>
+        </div>
+        <div class="qr-label">WIFI:T:WPA;S:kitchen-panel-setup;P:••••••••;;</div>
+        <div class="qr-label" style="color:var(--blue);font-weight:700">Scan to join WiFi</div>
+      </div>
+
+      <!-- Instructions -->
+      <div class="instructions">
+        <div class="instr-row">
+          <span class="mdi mdi-numeric-1-circle" style="color:var(--blue)"></span>
+          <div>
+            <div class="instr-text">Scan QR or join manually:</div>
+            <div class="instr-value" style="color:var(--blue)">kitchen-panel-setup</div>
+          </div>
+        </div>
+        <div class="instr-row">
+          <span class="mdi mdi-numeric-2-circle" style="color:var(--blue)"></span>
+          <div>
+            <div class="instr-text">Open browser and go to:</div>
+            <div class="instr-value" style="color:var(--blue)">192.168.4.1</div>
+          </div>
+        </div>
+        <div class="instr-row">
+          <span class="mdi mdi-numeric-3-circle" style="color:var(--blue)"></span>
+          <div class="instr-text">Enter your WiFi credentials<br>and Home Assistant details</div>
+        </div>
+        <div class="instr-row">
+          <span class="mdi mdi-numeric-4-circle" style="color:var(--blue)"></span>
+          <div class="instr-text">Device will reboot and connect</div>
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="mdi mdi-access-point"></span>
+        AP: <span class="val">kitchen-panel-setup</span>
+      </div>
+      <div class="status-item">
+        <span class="mdi mdi-chip"></span>
+        FW: <span class="val">2025.11.1</span>
+      </div>
+      <div class="status-item">
+        <span class="mdi mdi-timer-outline"></span>
+        Uptime: <span class="val">12s</span>
+      </div>
+      <div class="status-item">
+        <span class="mdi mdi-battery-80"></span>
+        Bat: <span class="val ok">87%</span>
+      </div>
+      <div class="status-item">
+        <span class="mdi mdi-thermometer"></span>
+        Temp: <span class="val">22.4°C</span>
+      </div>
+    </div>
+
+  </div>
+  <div class="device-label">AP Mode — No WiFi — reTerminal E1002 · 800×480</div>
+</div>
+
+<!-- ═══ STATE 2: NORMAL CONFIG MODE ═══ -->
+<div class="label">State 2 — Connected to WiFi — Config Mode</div>
+<div class="device-frame">
+  <div class="screen">
+
+    <div class="screen-title" style="color:var(--yellow)">
+      <span class="mdi mdi-cog-outline" style="font-size:32px;color:var(--yellow)"></span>
+      Config Mode
+    </div>
+    <div class="screen-subtitle" style="font-family:'DM Mono',monospace">
+      Auto-closes at 14:52 &nbsp;·&nbsp; resets on web activity
+    </div>
+
+    <div class="content-area">
+
+      <!-- URL QR code -->
+      <div class="qr-wrap">
+        <div class="qr-box">
+          <svg width="100%" height="100%" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+            <rect x="0" y="0" width="7" height="7" fill="#1a1a1a"/>
+            <rect x="1" y="1" width="5" height="5" fill="#f0ede8"/>
+            <rect x="2" y="2" width="3" height="3" fill="#1a1a1a"/>
+            <rect x="14" y="0" width="7" height="7" fill="#1a1a1a"/>
+            <rect x="15" y="1" width="5" height="5" fill="#f0ede8"/>
+            <rect x="16" y="2" width="3" height="3" fill="#1a1a1a"/>
+            <rect x="0" y="14" width="7" height="7" fill="#1a1a1a"/>
+            <rect x="1" y="15" width="5" height="5" fill="#f0ede8"/>
+            <rect x="2" y="16" width="3" height="3" fill="#1a1a1a"/>
+            <rect x="8" y="6" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="10" y="6" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="12" y="6" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="6" y="8" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="6" y="10" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="6" y="12" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="9" y="8" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="12" y="8" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="8" y="9" width="1" height="2" fill="#1a1a1a"/>
+            <rect x="11" y="9" width="2" height="1" fill="#1a1a1a"/>
+            <rect x="10" y="11" width="2" height="1" fill="#1a1a1a"/>
+            <rect x="13" y="10" width="1" height="2" fill="#1a1a1a"/>
+            <rect x="8" y="13" width="3" height="1" fill="#1a1a1a"/>
+            <rect x="15" y="8" width="2" height="2" fill="#1a1a1a"/>
+            <rect x="18" y="8" width="1" height="1" fill="#1a1a1a"/>
+            <rect x="20" y="8" width="1" height="3" fill="#1a1a1a"/>
+            <rect x="16" y="10" width="1" height="2" fill="#1a1a1a"/>
+            <rect x="18" y="11" width="2" height="1" fill="#1a1a1a"/>
+            <rect x="15" y="13" width="3" height="1" fill="#1a1a1a"/>
+            <rect x="8" y="15" width="1" height="4" fill="#1a1a1a"/>
+            <rect x="10" y="14" width="3" height="2" fill="#1a1a1a"/>
+            <rect x="9" y="17" width="2" height="2" fill="#1a1a1a"/>
+            <rect x="13" y="15" width="1" height="4" fill="#1a1a1a"/>
+            <rect x="15" y="14" width="2" height="3" fill="#1a1a1a"/>
+            <rect x="18" y="14" width="3" height="2" fill="#1a1a1a"/>
+            <rect x="17" y="17" width="2" height="2" fill="#1a1a1a"/>
+            <rect x="20" y="19" width="1" height="2" fill="#1a1a1a"/>
+          </svg>
+        </div>
+        <div class="qr-label" style="color:var(--blue);font-weight:700">http://192.168.1.42</div>
+        <div class="qr-label">Scan to open config</div>
+      </div>
+
+      <!-- Instructions -->
+      <div class="instructions">
+        <div class="instr-row">
+          <span class="mdi mdi-wifi" style="color:var(--blue)"></span>
+          <div>
+            <div class="instr-text">Open in browser:</div>
+            <div class="instr-value" style="color:var(--blue)">http://192.168.1.42</div>
+          </div>
+        </div>
+        <div class="instr-row">
+          <span class="mdi mdi-qrcode-scan" style="color:var(--black)"></span>
+          <div class="instr-text">Or scan the QR code</div>
+        </div>
+        <div class="instr-row">
+          <span class="mdi mdi-sleep-off" style="color:var(--yellow)"></span>
+          <div class="instr-text">Sleep disabled on this screen</div>
+        </div>
+        <div class="instr-row">
+          <span class="mdi mdi-gesture-tap-hold" style="color:var(--black)"></span>
+          <div class="instr-text">Long press middle to exit</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="mdi mdi-ip-network"></span>
+        IP: <span class="val">192.168.1.42</span>
+      </div>
+      <div class="status-item">
+        <span class="mdi mdi-wifi"></span>
+        WiFi: <span class="val ok">-61 dBm</span>
+      </div>
+      <div class="status-item">
+        <span class="mdi mdi-chip"></span>
+        FW: <span class="val">2025.11.1</span>
+      </div>
+      <div class="status-item">
+        <span class="mdi mdi-timer-outline"></span>
+        Uptime: <span class="val">2d 4h</span>
+      </div>
+      <div class="status-item">
+        <span class="mdi mdi-home-assistant"></span>
+        API: <span class="val ok">connected</span>
+      </div>
+      <div class="status-item">
+        <span class="mdi mdi-battery-80"></span>
+        Bat: <span class="val ok">87%</span>
+      </div>
+      <div class="status-item">
+        <span class="mdi mdi-thermometer"></span>
+        Temp: <span class="val">22.4°C</span>
+      </div>
+    </div>
+
+  </div>
+  <div class="device-label">Config Mode — WiFi Connected — reTerminal E1002 · 800×480</div>
+</div>
+
+<div style="display:flex;gap:16px;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;color:#888;flex-wrap:wrap">
+  <span style="color:#1a5fa8">■ Blue — AP/WiFi setup mode</span>
+  <span style="color:#e6b800">■ Yellow — config mode (connected)</span>
+  <span style="color:#1a1a1a">■ Black — instructions / status</span>
+</div>
+
+</body>
+</html>
