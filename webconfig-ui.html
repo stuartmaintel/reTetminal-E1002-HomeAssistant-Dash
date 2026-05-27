@@ -1,0 +1,2849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kitchen Panel — Config</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.2.96/css/materialdesignicons.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=DM+Mono:wght@500&display=swap');
+
+:root {
+  --bg:         #f2efe9;
+  --surface:    #faf8f4;
+  --border:     #d8d4cc;
+  --border-strong: #b0a898;
+  --text:       #1c1917;
+  --text-muted: #78716c;
+  --text-faint: #a8a29e;
+  --accent:     #1a5fa8;
+  --accent-soft:#e8f0fb;
+  --green:      #2e7d32;
+  --green-soft: #e8f5e9;
+  --red:        #c0392b;
+  --red-soft:   #fdecea;
+  --yellow:     #b45309;
+  --yellow-soft:#fef3c7;
+  --shadow:     0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.10);
+  --radius:     6px;
+  --mono: 'DM Mono', monospace;
+  --sans: 'Atkinson Hyperlegible', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+
+.header-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--text);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--surface);
+  font-size: 16px;
+}
+
+.header-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+.header-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--mono);
+}
+
+.timeout-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--yellow-soft);
+  border: 1px solid #fcd34d;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: var(--yellow);
+  font-weight: 500;
+  font-family: var(--mono);
+}
+
+.timeout-badge .mdi { font-size: 14px; }
+
+/* ── TABS ── */
+.tabs-wrap {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+
+.tabs {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0;
+}
+
+.tab {
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+  user-select: none;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: var(--sans);
+}
+
+.tab:hover { color: var(--text); }
+
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tab .mdi { font-size: 16px; }
+
+/* ── CONTENT ── */
+.content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.card-header {
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-title .mdi { font-size: 16px; color: var(--accent); }
+
+.card-body { padding: 16px 18px; }
+
+/* ── FORM FIELDS ── */
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.field-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.field { display: flex; flex-direction: column; gap: 4px; }
+
+.field-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.field-label .mdi { font-size: 13px; color: var(--accent); }
+
+.field input,
+.field select {
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.field input::placeholder { color: var(--text-faint); }
+
+.field-hint {
+  font-size: 10px;
+  color: var(--text-faint);
+  font-family: var(--mono);
+}
+
+/* ── SAVE BUTTON ── */
+.save-row {
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  background: var(--bg);
+}
+
+.btn-save {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--text);
+  color: var(--surface);
+  border: none;
+  border-radius: 4px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btn-save:hover { opacity: 0.85; }
+.btn-save .mdi { font-size: 15px; }
+
+.save-status {
+  font-size: 12px;
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-family: var(--mono);
+}
+
+.save-status.visible { opacity: 1; }
+.save-status .mdi { font-size: 14px; }
+
+/* ── ICON ROW ── */
+.icon-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.icon-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.icon-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-preview {
+  width: 32px;
+  height: 32px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.icon-preview-row input {
+  flex: 1;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 7px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+}
+
+.icon-preview-row input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* ── THRESHOLD SLIDERS ── */
+.threshold-row {
+  display: grid;
+  grid-template-columns: 180px 1fr 60px;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.threshold-row:last-child { border-bottom: none; }
+
+.threshold-label {
+  font-size: 13px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.threshold-label .mdi { font-size: 15px; color: var(--accent); }
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--text);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.threshold-val {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  text-align: right;
+}
+
+/* ── COLOR DOTS ── */
+.color-options {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.15s;
+}
+
+.color-dot.selected { border-color: var(--text); }
+.color-dot.c-red    { background: #c0392b; }
+.color-dot.c-yellow { background: #e6b800; }
+.color-dot.c-green  { background: #2e7d32; }
+.color-dot.c-blue   { background: #1a5fa8; }
+.color-dot.c-black  { background: #1a1a1a; }
+
+/* ── DEBUG TAB ── */
+.debug-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.debug-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.debug-icon { font-size: 16px; color: var(--text-muted); flex-shrink: 0; margin-top: 1px; }
+
+.debug-label { font-size: 11px; color: var(--text-muted); line-height: 1; margin-bottom: 2px; }
+.debug-value { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--text); }
+.debug-value.ok   { color: var(--green); }
+.debug-value.warn { color: var(--yellow); }
+.debug-value.err  { color: var(--red); }
+
+.entity-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-family: var(--mono);
+}
+
+.entity-table th {
+  text-align: left;
+  padding: 6px 10px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-family: var(--sans);
+  font-weight: 600;
+}
+
+.entity-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.entity-table tr:last-child td { border-bottom: none; }
+.entity-table tr:hover td { background: var(--bg); }
+
+.entity-name { color: var(--text-muted); }
+.entity-id   { color: var(--accent); }
+.entity-val  { color: var(--text); font-weight: 500; }
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-family: var(--sans);
+  font-weight: 500;
+}
+
+.pill-ok   { background: var(--green-soft); color: var(--green); }
+.pill-warn { background: var(--yellow-soft); color: var(--yellow); }
+.pill-err  { background: var(--red-soft); color: var(--red); }
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--text);
+  transition: all 0.15s;
+}
+
+.btn-action:hover { background: var(--bg); border-color: var(--border-strong); }
+.btn-action .mdi { font-size: 15px; color: var(--accent); }
+
+.btn-danger {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.btn-danger:hover { background: var(--red-soft); }
+.btn-danger .mdi { color: var(--red); }
+
+.action-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── SECTION DIVIDER ── */
+.section-divider {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 8px 0 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+  margin-top: 4px;
+}
+
+/* -- STATE COLOR PICKER ------------------------------------ */
+.state-color-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.state-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.state-row:last-child { border-bottom: none; }
+
+.state-label {
+  font-size: 13px;
+  color: var(--text);
+  min-width: 160px;
+  flex-shrink: 0;
+}
+
+.dot-picker {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.color-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: border-color 0.12s, transform 0.12s;
+  flex-shrink: 0;
+}
+.color-dot:hover { transform: scale(1.15); }
+.color-dot.selected { border-color: var(--black); transform: scale(1.15); }
+
+.dot-grey   { background: #aaaaaa; }
+.dot-black  { background: #1a1a1a; }
+.dot-red    { background: #c0392b; }
+.dot-yellow { background: #e6b800; }
+.dot-green  { background: #2e7d32; }
+.dot-blue   { background: #1a5fa8; }
+
+/* replaced */ .alert-slot-row-old {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.alert-slot-row:last-child { border-bottom: none; }
+.alert-slot-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 48px;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.alert-slot-details { border-bottom: 1px solid var(--border); }
+.alert-slot-details:last-child { border-bottom: none; }
+.alert-slot-summary {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  cursor: pointer;
+  list-style: none;
+  font-size: 14px;
+  color: var(--text);
+  user-select: none;
+}
+.alert-slot-summary::-webkit-details-marker { display: none; }
+.alert-slot-summary::before {
+  content: '\203A';
+  font-size: 18px;
+  margin-right: 8px;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+}
+details[open] .alert-slot-summary::before { transform: rotate(90deg); }
+.alert-slot-body {
+  padding: 0 0 12px 28px;
+}
+.entity-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.entity-input-row input {
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+}
+.entity-input-row input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-icon"><span class="mdi mdi-view-dashboard"></span></div>
+      <div>
+        <div class="header-title">Kitchen Panel</div>
+        <div class="header-sub">192.168.1.42 · kitchen-panel.local</div>
+      </div>
+    </div>
+    <div class="timeout-badge">
+      <span class="mdi mdi-timer-outline"></span>
+      Config closes at 14:52
+    </div>
+  </div>
+</div>
+
+<!-- ── TABS ── -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('sensors', this)">
+      <span class="mdi mdi-format-list-bulleted"></span> Sensors
+    </button>
+    <button class="tab" onclick="switchTab('icons', this)">
+      <span class="mdi mdi-palette-outline"></span> Icons &amp; Colors
+    </button>
+    <button class="tab" onclick="switchTab('colors', this)">
+      <span class="mdi mdi-palette"></span> State Colors
+    </button>
+    <button class="tab" onclick="switchTab('connection', this)">
+      <span class="mdi mdi-lan-connect"></span> Connection
+    </button>
+    <button class="tab" onclick="switchTab('debug', this)">
+      <span class="mdi mdi-bug-outline"></span> Debug
+    </button>
+  </div>
+</div>
+
+<!-- ── CONTENT ── -->
+<div class="content">
+
+  <!-- ════ TAB 1: SENSORS ════ -->
+  <div class="tab-panel active" id="tab-sensors">
+
+    <!-- WEATHER -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-weather-partly-cloudy"></span>Weather</div>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-thermometer"></span>Weather Entity</div>
+            <input type="text" value="weather.home" data-sensor="weather" placeholder="weather.home">
+            <div class="field-hint">e.g. weather.met_no_home or weather.openweathermap</div>
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-calendar-clock"></span>Forecast Attribute</div>
+            <input type="text" value="forecast" placeholder="forecast">
+            <div class="field-hint">Usually 'forecast' — check your integration</div>
+          </div>
+        </div>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-weather-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveSection('weather')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    <!-- SOLAR & BATTERY -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-solar-power-variant"></span>Solar &amp; Battery</div>
+      </div>
+      <div class="card-body">
+        <div class="section-divider">Solar</div>
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-solar-power-variant"></span>Solar Generated Today</div>
+            <input type="text" value="sensor.solar_energy_today" data-sensor="solar_today" placeholder="sensor.solar_energy_today">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-calendar-check"></span>Solar Expected Today</div>
+            <input type="text" value="sensor.solar_forecast_today" data-sensor="solar_expected" placeholder="sensor.solar_forecast_today">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-home-lightning-bolt"></span>Home Load Today</div>
+            <input type="text" value="sensor.home_consumption_today" data-sensor="load_today" placeholder="sensor.home_consumption_today">
+          </div>
+        </div>
+        <div class="section-divider" style="margin-top:16px">Grid</div>
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-transmission-tower-export"></span>Grid Export Today</div>
+            <input type="text" value="sensor.grid_export_today" data-sensor="grid_export" placeholder="sensor.grid_export_today">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-transmission-tower-import"></span>Grid Import Today</div>
+            <input type="text" value="sensor.grid_import_today" data-sensor="grid_import" placeholder="sensor.grid_import_today">
+          </div>
+        </div>
+        <div class="section-divider" style="margin-top:16px">Battery</div>
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-battery-80"></span>Battery SOC (%)</div>
+            <input type="text" value="sensor.battery_soc" data-sensor="battery_soc" placeholder="sensor.battery_soc">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-battery-arrow-up"></span>Battery Status</div>
+            <input type="text" value="sensor.battery_status" data-sensor="battery_status" placeholder="sensor.battery_status">
+            <div class="field-hint">charging / discharging / idle / full</div>
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-clock-fast"></span>Battery ETA</div>
+            <input type="text" value="sensor.battery_time_to_full" data-sensor="battery_eta" placeholder="sensor.battery_time_to_full">
+            <div class="field-hint">Time to full/empty as HH:MM or timestamp</div>
+          </div>
+        </div>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-solar-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveSection('solar')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    <!-- ROOM TEMPERATURES -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-thermometer"></span>Room Temperatures</div>
+      </div>
+      <div class="card-body">
+        <div class="section-divider">Upstairs</div>
+        <div class="field-grid-3">
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-bed"></span>Room 1 Name</div>
+            <input type="text" value="Main Bedroom" placeholder="Room name">
+          </div>
+          <div class="field">
+            <div class="field-label">Temperature Sensor</div>
+            <input type="text" value="sensor.main_bed_temperature" placeholder="sensor.xxx_temperature">
+          </div>
+          <div class="field">
+            <div class="field-label">Humidity Sensor</div>
+            <input type="text" value="sensor.main_bed_humidity" placeholder="sensor.xxx_humidity">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-bed"></span>Room 2 Name</div>
+            <input type="text" value="Guest Room" placeholder="Room name">
+          </div>
+          <div class="field">
+            <div class="field-label">Temperature Sensor</div>
+            <input type="text" value="sensor.guest_temperature" placeholder="sensor.xxx_temperature">
+          </div>
+          <div class="field">
+            <div class="field-label">Humidity Sensor</div>
+            <input type="text" value="sensor.guest_humidity" placeholder="sensor.xxx_humidity">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-shower"></span>Room 3 Name</div>
+            <input type="text" value="Bathroom" placeholder="Room name">
+          </div>
+          <div class="field">
+            <div class="field-label">Temperature Sensor</div>
+            <input type="text" value="sensor.bathroom_temperature" placeholder="sensor.xxx_temperature">
+          </div>
+          <div class="field">
+            <div class="field-label">Humidity Sensor</div>
+            <input type="text" value="sensor.bathroom_humidity" placeholder="sensor.xxx_humidity">
+          </div>
+        </div>
+        <div class="section-divider" style="margin-top:16px">Downstairs</div>
+        <div class="field-grid-3">
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-sofa"></span>Room 4 Name</div>
+            <input type="text" value="Living Room" placeholder="Room name">
+          </div>
+          <div class="field">
+            <div class="field-label">Temperature Sensor</div>
+            <input type="text" value="sensor.living_temperature" placeholder="sensor.xxx_temperature">
+          </div>
+          <div class="field">
+            <div class="field-label">Humidity Sensor</div>
+            <input type="text" value="sensor.living_humidity" placeholder="sensor.xxx_humidity">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-chef-hat"></span>Room 5 Name</div>
+            <input type="text" value="Kitchen" placeholder="Room name">
+          </div>
+          <div class="field">
+            <div class="field-label">Temperature Sensor</div>
+            <input type="text" value="sensor.kitchen_temperature" placeholder="sensor.xxx_temperature">
+          </div>
+          <div class="field">
+            <div class="field-label">Humidity Sensor</div>
+            <input type="text" value="sensor.kitchen_humidity" placeholder="sensor.xxx_humidity">
+          </div>
+        </div>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-rooms-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveSection('rooms')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    <!-- STATUS ICONS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-shield-home"></span>Status Icon Sensors</div>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-shield-home"></span>Alarm Entity</div>
+            <input type="text" value="alarm_control_panel.home" data-sensor="alarm" placeholder="alarm_control_panel.home">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-door-open"></span>Door Group / Sensor</div>
+            <input type="text" value="binary_sensor.any_door_open" data-sensor="door" placeholder="binary_sensor.xxx">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-window-open"></span>Window Group / Sensor</div>
+            <input type="text" value="binary_sensor.any_window_open" data-sensor="window" placeholder="binary_sensor.xxx">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-flower"></span>Plant Watering Status</div>
+            <input type="text" value="sensor.plant_watering_status" data-sensor="plant" placeholder="sensor.xxx">
+            <div class="field-hint">due / ok / watered</div>
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-radiator"></span>Heating Active</div>
+            <input type="text" value="binary_sensor.heating_active" data-sensor="heating" placeholder="binary_sensor.xxx">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-water-boiler"></span>Hot Water Active</div>
+            <input type="text" value="binary_sensor.hot_water_active" data-sensor="hotwater" placeholder="binary_sensor.xxx">
+          </div>
+        </div>
+        <div class="section-divider" style="margin-top:16px">Robots</div>
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-robot-vacuum"></span>Vacuum 1</div>
+            <input type="text" value="vacuum.downstairs" data-sensor="vacuum1" placeholder="vacuum.xxx">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-robot-vacuum-variant"></span>Vacuum 2</div>
+            <input type="text" value="vacuum.upstairs" data-sensor="vacuum2" placeholder="vacuum.xxx">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-robot-mower"></span>Mower</div>
+            <input type="text" value="lawn_mower.garden" data-sensor="mower" placeholder="lawn_mower.xxx">
+          </div>
+        </div>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-icons-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveSection('icons')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    <!-- PRESENCE, MEDIA, TRANSPORT -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-account-group"></span>Presence, Media &amp; Transport</div>
+      </div>
+      <div class="card-body">
+        <div class="section-divider">Presence (up to 4 people)</div>
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label">Person 1</div>
+            <input type="text" value="person.alex" placeholder="person.xxx">
+          </div>
+          <div class="field">
+            <div class="field-label">Person 2</div>
+            <input type="text" value="person.sam" placeholder="person.xxx">
+          </div>
+          <div class="field">
+            <div class="field-label">Person 3</div>
+            <input type="text" value="person.jamie" placeholder="person.xxx or leave blank">
+          </div>
+          <div class="field">
+            <div class="field-label">Person 4</div>
+            <input type="text" value="person.riley" placeholder="person.xxx or leave blank">
+          </div>
+        </div>
+        <div class="section-divider" style="margin-top:16px">Media Players (up to 2)</div>
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-speaker"></span>Media Player 1</div>
+            <input type="text" value="media_player.bedroom" placeholder="media_player.xxx">
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-television"></span>Media Player 2</div>
+            <input type="text" value="media_player.living_room_tv" placeholder="media_player.xxx">
+          </div>
+        </div>
+        <div class="section-divider" style="margin-top:16px">Transport Routes (up to 3)</div>
+        <div class="field-grid-3">
+          <div class="field">
+            <div class="field-label">Route 1 Name</div>
+            <input type="text" value="42 · City Centre" placeholder="Display name">
+          </div>
+          <div class="field">
+            <div class="field-label">Departure 1 Sensor</div>
+            <input type="text" value="sensor.bus_42_next" placeholder="sensor.xxx_next_departure">
+          </div>
+          <div class="field">
+            <div class="field-label">Departure 2 Sensor</div>
+            <input type="text" value="sensor.bus_42_next2" placeholder="sensor.xxx_departure_2">
+          </div>
+          <div class="field">
+            <div class="field-label">Route 2 Name</div>
+            <input type="text" value="Overground · Waterloo" placeholder="Display name">
+          </div>
+          <div class="field">
+            <div class="field-label">Departure 1 Sensor</div>
+            <input type="text" value="sensor.train_next" placeholder="sensor.xxx_next_departure">
+          </div>
+          <div class="field">
+            <div class="field-label">Departure 2 Sensor</div>
+            <input type="text" value="sensor.train_next2" placeholder="sensor.xxx_departure_2">
+          </div>
+          <div class="field">
+            <div class="field-label">Route 3 Name</div>
+            <input type="text" value="7 · Airport" placeholder="Display name">
+          </div>
+          <div class="field">
+            <div class="field-label">Departure 1 Sensor</div>
+            <input type="text" value="sensor.bus_7_next" placeholder="sensor.xxx_next_departure">
+          </div>
+          <div class="field">
+            <div class="field-label">Departure 2 Sensor</div>
+            <input type="text" value="sensor.bus_7_next2" placeholder="sensor.xxx_departure_2">
+          </div>
+        </div>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-presence-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveSection('presence')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-calendar"></span>Calendar</div>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-calendar"></span>Calendar Events Sensor</div>
+            <input type="text" value="sensor.calendar_today_events" data-sensor="calendar" placeholder="sensor.calendar_today_events">
+            <div class="field-hint">Template sensor — see ha_templates.yaml</div>
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-counter"></span>Max Events to Show</div>
+            <input type="number" value="4" min="1" max="8" placeholder="4">
+          </div>
+        </div>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-calendar-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveSection('calendar')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+
+
+    <!-- ALERT SLOTS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-bell-outline"></span>Status Alert Slots</div>
+      </div>
+      <div class="card-body">
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">
+          Each slot watches up to 8 entities. When any match the condition, active names are shown
+          on screen 1 (e.g. <em>Front door, Garage open</em>). The suffix is appended after the names.
+          Conditions: <code style="font-family:var(--mono);background:var(--bg);padding:1px 4px;border-radius:3px">eq</code>==
+          <code style="font-family:var(--mono);background:var(--bg);padding:1px 4px;border-radius:3px">ne</code>!=
+          <code style="font-family:var(--mono);background:var(--bg);padding:1px 4px;border-radius:3px">gt/lt</code>numeric
+          <code style="font-family:var(--mono);background:var(--bg);padding:1px 4px;border-radius:3px">contains</code>substring
+        </p>
+        <details class="alert-slot-details" data-slot="1">
+          <summary class="alert-slot-summary">
+            <span class="mdi mdi-shield-home" style="font-size:18px;margin-right:6px"></span>
+            <strong>Alarm</strong>
+            <span class="slot-entity-count" style="font-size:11px;color:var(--text-muted);margin-left:8px"></span>
+          </summary>
+          <div class="alert-slot-body">
+            <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Condition</div>
+                <select data-alert-cond="1"><option value="eq" >== equals</option><option value="ne" selected>!= not equals</option><option value="gt" >> greater than</option><option value="lt" >< less than</option><option value="contains" >contains</option></select>
+              </div>
+              <div class="field" style="flex:1;min-width:100px">
+                <div class="field-label">Value</div>
+                <input type="text" value="disarmed" data-alert-value="1" placeholder="e.g. on">
+              </div>
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Label suffix</div>
+                <input type="text" value="armed" data-alert-suffix="1" placeholder="e.g. open">
+                <div class="field-hint">Appended after names: "Front door armed"</div>
+              </div>
+              <div class="field" style="flex:0 0 60px;align-items:center;justify-content:center;display:flex;flex-direction:column">
+                <div class="field-label">Active</div>
+                <input type="checkbox" data-alert-enabled="1" checked style="width:18px;height:18px;cursor:pointer">
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">
+              Entities (up to 8) — Entity ID + Friendly Name
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div class="entity-input-row">
+                <input type="text" value="alarm_control_panel.home" data-alert-entity="1-1"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Alarm" data-alert-name="1-1"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="1-2"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="1-2"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="1-3"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="1-3"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="1-4"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="1-4"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="1-5"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="1-5"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="1-6"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="1-6"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="1-7"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="1-7"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="1-8"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="1-8"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+            </div>
+          </div>
+        </details>
+        <details class="alert-slot-details" data-slot="2">
+          <summary class="alert-slot-summary">
+            <span class="mdi mdi-door-open" style="font-size:18px;margin-right:6px"></span>
+            <strong>Doors</strong>
+            <span class="slot-entity-count" style="font-size:11px;color:var(--text-muted);margin-left:8px"></span>
+          </summary>
+          <div class="alert-slot-body">
+            <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Condition</div>
+                <select data-alert-cond="2"><option value="eq" selected>== equals</option><option value="ne" >!= not equals</option><option value="gt" >> greater than</option><option value="lt" >< less than</option><option value="contains" >contains</option></select>
+              </div>
+              <div class="field" style="flex:1;min-width:100px">
+                <div class="field-label">Value</div>
+                <input type="text" value="on" data-alert-value="2" placeholder="e.g. on">
+              </div>
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Label suffix</div>
+                <input type="text" value="open" data-alert-suffix="2" placeholder="e.g. open">
+                <div class="field-hint">Appended after names: "Front door open"</div>
+              </div>
+              <div class="field" style="flex:0 0 60px;align-items:center;justify-content:center;display:flex;flex-direction:column">
+                <div class="field-label">Active</div>
+                <input type="checkbox" data-alert-enabled="2" checked style="width:18px;height:18px;cursor:pointer">
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">
+              Entities (up to 8) — Entity ID + Friendly Name
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div class="entity-input-row">
+                <input type="text" value="binary_sensor.front_door" data-alert-entity="2-1"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Front door" data-alert-name="2-1"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="binary_sensor.back_door" data-alert-entity="2-2"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Back door" data-alert-name="2-2"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="binary_sensor.garage" data-alert-entity="2-3"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Garage" data-alert-name="2-3"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="binary_sensor.side_gate" data-alert-entity="2-4"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Side gate" data-alert-name="2-4"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="2-5"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="2-5"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="2-6"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="2-6"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="2-7"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="2-7"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="2-8"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="2-8"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+            </div>
+          </div>
+        </details>
+        <details class="alert-slot-details" data-slot="3">
+          <summary class="alert-slot-summary">
+            <span class="mdi mdi-window-open" style="font-size:18px;margin-right:6px"></span>
+            <strong>Windows</strong>
+            <span class="slot-entity-count" style="font-size:11px;color:var(--text-muted);margin-left:8px"></span>
+          </summary>
+          <div class="alert-slot-body">
+            <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Condition</div>
+                <select data-alert-cond="3"><option value="eq" selected>== equals</option><option value="ne" >!= not equals</option><option value="gt" >> greater than</option><option value="lt" >< less than</option><option value="contains" >contains</option></select>
+              </div>
+              <div class="field" style="flex:1;min-width:100px">
+                <div class="field-label">Value</div>
+                <input type="text" value="on" data-alert-value="3" placeholder="e.g. on">
+              </div>
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Label suffix</div>
+                <input type="text" value="open" data-alert-suffix="3" placeholder="e.g. open">
+                <div class="field-hint">Appended after names: "Front door open"</div>
+              </div>
+              <div class="field" style="flex:0 0 60px;align-items:center;justify-content:center;display:flex;flex-direction:column">
+                <div class="field-label">Active</div>
+                <input type="checkbox" data-alert-enabled="3" checked style="width:18px;height:18px;cursor:pointer">
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">
+              Entities (up to 8) — Entity ID + Friendly Name
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div class="entity-input-row">
+                <input type="text" value="binary_sensor.kitchen_window" data-alert-entity="3-1"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Kitchen" data-alert-name="3-1"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="binary_sensor.living_window" data-alert-entity="3-2"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Living room" data-alert-name="3-2"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="binary_sensor.bedroom_window" data-alert-entity="3-3"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Main bed" data-alert-name="3-3"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="3-4"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="3-4"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="3-5"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="3-5"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="3-6"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="3-6"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="3-7"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="3-7"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="3-8"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="3-8"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+            </div>
+          </div>
+        </details>
+        <details class="alert-slot-details" data-slot="4">
+          <summary class="alert-slot-summary">
+            <span class="mdi mdi-flower" style="font-size:18px;margin-right:6px"></span>
+            <strong>Plants</strong>
+            <span class="slot-entity-count" style="font-size:11px;color:var(--text-muted);margin-left:8px"></span>
+          </summary>
+          <div class="alert-slot-body">
+            <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Condition</div>
+                <select data-alert-cond="4"><option value="eq" selected>== equals</option><option value="ne" >!= not equals</option><option value="gt" >> greater than</option><option value="lt" >< less than</option><option value="contains" >contains</option></select>
+              </div>
+              <div class="field" style="flex:1;min-width:100px">
+                <div class="field-label">Value</div>
+                <input type="text" value="due" data-alert-value="4" placeholder="e.g. on">
+              </div>
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Label suffix</div>
+                <input type="text" value="due" data-alert-suffix="4" placeholder="e.g. open">
+                <div class="field-hint">Appended after names: "Front door due"</div>
+              </div>
+              <div class="field" style="flex:0 0 60px;align-items:center;justify-content:center;display:flex;flex-direction:column">
+                <div class="field-label">Active</div>
+                <input type="checkbox" data-alert-enabled="4" checked style="width:18px;height:18px;cursor:pointer">
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">
+              Entities (up to 8) — Entity ID + Friendly Name
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div class="entity-input-row">
+                <input type="text" value="sensor.plant_watering_status" data-alert-entity="4-1"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Plants" data-alert-name="4-1"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="4-2"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="4-2"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="4-3"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="4-3"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="4-4"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="4-4"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="4-5"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="4-5"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="4-6"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="4-6"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="4-7"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="4-7"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="4-8"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="4-8"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+            </div>
+          </div>
+        </details>
+        <details class="alert-slot-details" data-slot="5">
+          <summary class="alert-slot-summary">
+            <span class="mdi mdi-radiator" style="font-size:18px;margin-right:6px"></span>
+            <strong>Heating</strong>
+            <span class="slot-entity-count" style="font-size:11px;color:var(--text-muted);margin-left:8px"></span>
+          </summary>
+          <div class="alert-slot-body">
+            <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Condition</div>
+                <select data-alert-cond="5"><option value="eq" selected>== equals</option><option value="ne" >!= not equals</option><option value="gt" >> greater than</option><option value="lt" >< less than</option><option value="contains" >contains</option></select>
+              </div>
+              <div class="field" style="flex:1;min-width:100px">
+                <div class="field-label">Value</div>
+                <input type="text" value="on" data-alert-value="5" placeholder="e.g. on">
+              </div>
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Label suffix</div>
+                <input type="text" value="active" data-alert-suffix="5" placeholder="e.g. open">
+                <div class="field-hint">Appended after names: "Front door active"</div>
+              </div>
+              <div class="field" style="flex:0 0 60px;align-items:center;justify-content:center;display:flex;flex-direction:column">
+                <div class="field-label">Active</div>
+                <input type="checkbox" data-alert-enabled="5" checked style="width:18px;height:18px;cursor:pointer">
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">
+              Entities (up to 8) — Entity ID + Friendly Name
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div class="entity-input-row">
+                <input type="text" value="binary_sensor.heating_active" data-alert-entity="5-1"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Heating" data-alert-name="5-1"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="5-2"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="5-2"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="5-3"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="5-3"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="5-4"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="5-4"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="5-5"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="5-5"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="5-6"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="5-6"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="5-7"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="5-7"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="5-8"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="5-8"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+            </div>
+          </div>
+        </details>
+        <details class="alert-slot-details" data-slot="6">
+          <summary class="alert-slot-summary">
+            <span class="mdi mdi-water-boiler" style="font-size:18px;margin-right:6px"></span>
+            <strong>Hot Water</strong>
+            <span class="slot-entity-count" style="font-size:11px;color:var(--text-muted);margin-left:8px"></span>
+          </summary>
+          <div class="alert-slot-body">
+            <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Condition</div>
+                <select data-alert-cond="6"><option value="eq" selected>== equals</option><option value="ne" >!= not equals</option><option value="gt" >> greater than</option><option value="lt" >< less than</option><option value="contains" >contains</option></select>
+              </div>
+              <div class="field" style="flex:1;min-width:100px">
+                <div class="field-label">Value</div>
+                <input type="text" value="on" data-alert-value="6" placeholder="e.g. on">
+              </div>
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Label suffix</div>
+                <input type="text" value="heating" data-alert-suffix="6" placeholder="e.g. open">
+                <div class="field-hint">Appended after names: "Front door heating"</div>
+              </div>
+              <div class="field" style="flex:0 0 60px;align-items:center;justify-content:center;display:flex;flex-direction:column">
+                <div class="field-label">Active</div>
+                <input type="checkbox" data-alert-enabled="6" checked style="width:18px;height:18px;cursor:pointer">
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">
+              Entities (up to 8) — Entity ID + Friendly Name
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div class="entity-input-row">
+                <input type="text" value="binary_sensor.hot_water_active" data-alert-entity="6-1"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Hot water" data-alert-name="6-1"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="6-2"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="6-2"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="6-3"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="6-3"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="6-4"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="6-4"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="6-5"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="6-5"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="6-6"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="6-6"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="6-7"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="6-7"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="6-8"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="6-8"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+            </div>
+          </div>
+        </details>
+        <details class="alert-slot-details" data-slot="7">
+          <summary class="alert-slot-summary">
+            <span class="mdi mdi-robot-vacuum" style="font-size:18px;margin-right:6px"></span>
+            <strong>Vacuum 1</strong>
+            <span class="slot-entity-count" style="font-size:11px;color:var(--text-muted);margin-left:8px"></span>
+          </summary>
+          <div class="alert-slot-body">
+            <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Condition</div>
+                <select data-alert-cond="7"><option value="eq" selected>== equals</option><option value="ne" >!= not equals</option><option value="gt" >> greater than</option><option value="lt" >< less than</option><option value="contains" >contains</option></select>
+              </div>
+              <div class="field" style="flex:1;min-width:100px">
+                <div class="field-label">Value</div>
+                <input type="text" value="cleaning" data-alert-value="7" placeholder="e.g. on">
+              </div>
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Label suffix</div>
+                <input type="text" value="running" data-alert-suffix="7" placeholder="e.g. open">
+                <div class="field-hint">Appended after names: "Front door running"</div>
+              </div>
+              <div class="field" style="flex:0 0 60px;align-items:center;justify-content:center;display:flex;flex-direction:column">
+                <div class="field-label">Active</div>
+                <input type="checkbox" data-alert-enabled="7" checked style="width:18px;height:18px;cursor:pointer">
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">
+              Entities (up to 8) — Entity ID + Friendly Name
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div class="entity-input-row">
+                <input type="text" value="vacuum.downstairs" data-alert-entity="7-1"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Vacuum 1" data-alert-name="7-1"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="7-2"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="7-2"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="7-3"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="7-3"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="7-4"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="7-4"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="7-5"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="7-5"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="7-6"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="7-6"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="7-7"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="7-7"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="7-8"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="7-8"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+            </div>
+          </div>
+        </details>
+        <details class="alert-slot-details" data-slot="8">
+          <summary class="alert-slot-summary">
+            <span class="mdi mdi-robot-vacuum-variant" style="font-size:18px;margin-right:6px"></span>
+            <strong>Vacuum 2</strong>
+            <span class="slot-entity-count" style="font-size:11px;color:var(--text-muted);margin-left:8px"></span>
+          </summary>
+          <div class="alert-slot-body">
+            <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Condition</div>
+                <select data-alert-cond="8"><option value="eq" selected>== equals</option><option value="ne" >!= not equals</option><option value="gt" >> greater than</option><option value="lt" >< less than</option><option value="contains" >contains</option></select>
+              </div>
+              <div class="field" style="flex:1;min-width:100px">
+                <div class="field-label">Value</div>
+                <input type="text" value="cleaning" data-alert-value="8" placeholder="e.g. on">
+              </div>
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Label suffix</div>
+                <input type="text" value="running" data-alert-suffix="8" placeholder="e.g. open">
+                <div class="field-hint">Appended after names: "Front door running"</div>
+              </div>
+              <div class="field" style="flex:0 0 60px;align-items:center;justify-content:center;display:flex;flex-direction:column">
+                <div class="field-label">Active</div>
+                <input type="checkbox" data-alert-enabled="8" checked style="width:18px;height:18px;cursor:pointer">
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">
+              Entities (up to 8) — Entity ID + Friendly Name
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div class="entity-input-row">
+                <input type="text" value="vacuum.upstairs" data-alert-entity="8-1"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Vacuum 2" data-alert-name="8-1"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="8-2"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="8-2"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="8-3"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="8-3"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="8-4"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="8-4"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="8-5"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="8-5"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="8-6"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="8-6"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="8-7"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="8-7"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="8-8"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="8-8"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+            </div>
+          </div>
+        </details>
+        <details class="alert-slot-details" data-slot="9">
+          <summary class="alert-slot-summary">
+            <span class="mdi mdi-robot-mower" style="font-size:18px;margin-right:6px"></span>
+            <strong>Mower</strong>
+            <span class="slot-entity-count" style="font-size:11px;color:var(--text-muted);margin-left:8px"></span>
+          </summary>
+          <div class="alert-slot-body">
+            <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Condition</div>
+                <select data-alert-cond="9"><option value="eq" selected>== equals</option><option value="ne" >!= not equals</option><option value="gt" >> greater than</option><option value="lt" >< less than</option><option value="contains" >contains</option></select>
+              </div>
+              <div class="field" style="flex:1;min-width:100px">
+                <div class="field-label">Value</div>
+                <input type="text" value="mowing" data-alert-value="9" placeholder="e.g. on">
+              </div>
+              <div class="field" style="flex:1;min-width:120px">
+                <div class="field-label">Label suffix</div>
+                <input type="text" value="running" data-alert-suffix="9" placeholder="e.g. open">
+                <div class="field-hint">Appended after names: "Front door running"</div>
+              </div>
+              <div class="field" style="flex:0 0 60px;align-items:center;justify-content:center;display:flex;flex-direction:column">
+                <div class="field-label">Active</div>
+                <input type="checkbox" data-alert-enabled="9" checked style="width:18px;height:18px;cursor:pointer">
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">
+              Entities (up to 8) — Entity ID + Friendly Name
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div class="entity-input-row">
+                <input type="text" value="lawn_mower.garden" data-alert-entity="9-1"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="Mower" data-alert-name="9-1"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="9-2"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="9-2"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="9-3"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="9-3"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="9-4"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="9-4"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="9-5"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="9-5"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="9-6"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="9-6"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="9-7"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="9-7"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+              <div class="entity-input-row">
+                <input type="text" value="" data-alert-entity="9-8"
+                       placeholder="entity_id (leave blank to skip)" style="flex:2">
+                <input type="text" value="" data-alert-name="9-8"
+                       placeholder="Friendly name" style="flex:1">
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-alerts-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveAlerts()"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    </div><!-- /tab-sensors -->
+
+
+  <!-- ════ TAB 2: ICONS & COLORS ════ -->
+  <div class="tab-panel" id="tab-icons">
+
+    <!-- ICON ASSIGNMENTS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-format-list-bulleted-type"></span>Icon Assignments</div>
+      </div>
+      <div class="card-body">
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">
+          Enter MDI icon names without the <code style="font-family:var(--mono);background:var(--bg);padding:1px 5px;border-radius:3px">mdi:</code> prefix. 
+          <a href="https://pictogrammers.com/library/mdi/" target="_blank" style="color:var(--accent)">Browse icons ↗</a>
+        </p>
+        <div class="icon-row">
+
+          <div class="icon-field">
+            <div class="field-label"><span class="mdi mdi-shield-home" style="color:var(--accent)"></span>Alarm</div>
+            <div class="icon-preview-row">
+              <div class="icon-preview"><span class="mdi mdi-shield-home" id="prev-alarm"></span></div>
+              <input type="text" value="shield-home" data-icon-slot="alarm" oninput="updateIcon('alarm',this.value)">
+            </div>
+          </div>
+
+          <div class="icon-field">
+            <div class="field-label"><span class="mdi mdi-door-open" style="color:var(--accent)"></span>Door (open)</div>
+            <div class="icon-preview-row">
+              <div class="icon-preview"><span class="mdi mdi-door-open" id="prev-door"></span></div>
+              <input type="text" value="door-open" data-icon-slot="door" oninput="updateIcon('door',this.value)">
+            </div>
+          </div>
+
+          <div class="icon-field">
+            <div class="field-label"><span class="mdi mdi-window-open" style="color:var(--accent)"></span>Window (open)</div>
+            <div class="icon-preview-row">
+              <div class="icon-preview"><span class="mdi mdi-window-open" id="prev-window"></span></div>
+              <input type="text" value="window-open" data-icon-slot="window" oninput="updateIcon('window',this.value)">
+            </div>
+          </div>
+
+          <div class="icon-field">
+            <div class="field-label"><span class="mdi mdi-flower" style="color:var(--accent)"></span>Plants</div>
+            <div class="icon-preview-row">
+              <div class="icon-preview"><span class="mdi mdi-flower" id="prev-plants"></span></div>
+              <input type="text" value="flower" data-icon-slot="plant" oninput="updateIcon('plants',this.value)">
+            </div>
+          </div>
+
+          <div class="icon-field">
+            <div class="field-label"><span class="mdi mdi-radiator" style="color:var(--accent)"></span>Heating</div>
+            <div class="icon-preview-row">
+              <div class="icon-preview"><span class="mdi mdi-radiator" id="prev-heating"></span></div>
+              <input type="text" value="radiator" data-icon-slot="heating" oninput="updateIcon('heating',this.value)">
+            </div>
+          </div>
+
+          <div class="icon-field">
+            <div class="field-label"><span class="mdi mdi-water-boiler" style="color:var(--accent)"></span>Hot Water</div>
+            <div class="icon-preview-row">
+              <div class="icon-preview"><span class="mdi mdi-water-boiler" id="prev-hotwater"></span></div>
+              <input type="text" value="water-boiler" data-icon-slot="hotwater" oninput="updateIcon('hotwater',this.value)">
+            </div>
+          </div>
+
+          <div class="icon-field">
+            <div class="field-label"><span class="mdi mdi-robot-vacuum" style="color:var(--accent)"></span>Vacuum 1</div>
+            <div class="icon-preview-row">
+              <div class="icon-preview"><span class="mdi mdi-robot-vacuum" id="prev-vac1"></span></div>
+              <input type="text" value="robot-vacuum" data-icon-slot="vacuum1" oninput="updateIcon('vac1',this.value)">
+            </div>
+          </div>
+
+          <div class="icon-field">
+            <div class="field-label"><span class="mdi mdi-robot-vacuum-variant" style="color:var(--accent)"></span>Vacuum 2</div>
+            <div class="icon-preview-row">
+              <div class="icon-preview"><span class="mdi mdi-robot-vacuum-variant" id="prev-vac2"></span></div>
+              <input type="text" value="robot-vacuum-variant" data-icon-slot="vacuum2" oninput="updateIcon('vac2',this.value)">
+            </div>
+          </div>
+
+          <div class="icon-field">
+            <div class="field-label"><span class="mdi mdi-robot-mower" style="color:var(--accent)"></span>Mower</div>
+            <div class="icon-preview-row">
+              <div class="icon-preview"><span class="mdi mdi-robot-mower" id="prev-mower"></span></div>
+              <input type="text" value="robot-mower" data-icon-slot="mower" oninput="updateIcon('mower',this.value)">
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-iconnames-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveSection('iconnames')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    <!-- COLOR THRESHOLDS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-palette"></span>Color Thresholds</div>
+      </div>
+      <div class="card-body">
+
+        <div class="threshold-row">
+          <div class="threshold-label"><span class="mdi mdi-battery-alert"></span>Battery critical (%)</div>
+          <input type="range" min="5" max="30" value="10" data-threshold="battery_critical" oninput="this.nextElementSibling.textContent=this.value+'%'">
+          <div class="threshold-val">10%</div>
+        </div>
+
+        <div class="threshold-row">
+          <div class="threshold-label"><span class="mdi mdi-battery-low"></span>Battery low (%)</div>
+          <input type="range" min="10" max="50" value="20" data-threshold="battery_low" oninput="this.nextElementSibling.textContent=this.value+'%'">
+          <div class="threshold-val">20%</div>
+        </div>
+
+        <div class="threshold-row">
+          <div class="threshold-label"><span class="mdi mdi-solar-power-variant"></span>Solar peak expected (kWh)</div>
+          <input type="range" min="5" max="60" value="52" data-threshold="solar_peak" oninput="this.nextElementSibling.textContent=this.value+' kWh'">
+          <div class="threshold-val">52 kWh</div>
+        </div>
+
+        <div class="threshold-row">
+          <div class="threshold-label"><span class="mdi mdi-clock-alert"></span>Transport urgent (mins)</div>
+          <input type="range" min="1" max="15" value="5" data-threshold="transport_urgent" oninput="this.nextElementSibling.textContent=this.value+' min'">
+          <div class="threshold-val">5 min</div>
+        </div>
+
+        <div class="threshold-row">
+          <div class="threshold-label"><span class="mdi mdi-timer-outline"></span>Config timeout (mins)</div>
+          <input type="range" min="2" max="30" value="10" data-threshold="config_timeout" oninput="this.nextElementSibling.textContent=this.value+' min'">
+          <div class="threshold-val">10 min</div>
+        </div>
+
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-thresholds-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveSection('thresholds')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    <!-- DOOR/WINDOW DETAIL NAMES -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-door"></span>Door &amp; Window Names</div>
+      </div>
+      <div class="card-body">
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">
+          When a door or window is open, the detail area shows the name. Map entity IDs to friendly names here.
+        </p>
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label">binary_sensor.front_door</div>
+            <input type="text" value="Front door" placeholder="Friendly name">
+          </div>
+          <div class="field">
+            <div class="field-label">binary_sensor.back_door</div>
+            <input type="text" value="Back door" placeholder="Friendly name">
+          </div>
+          <div class="field">
+            <div class="field-label">binary_sensor.kitchen_window</div>
+            <input type="text" value="Kitchen window" placeholder="Friendly name">
+          </div>
+          <div class="field">
+            <div class="field-label">binary_sensor.living_window</div>
+            <input type="text" value="Living room window" placeholder="Friendly name">
+          </div>
+        </div>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-names-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveSection('names')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+  </div><!-- /tab-icons -->
+
+  <!-- ==== TAB: STATE COLORS ==== -->
+  <div class="tab-panel" id="tab-colors">
+
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;display:flex;align-items:center;gap:8px">
+      <span class="mdi mdi-information-outline" style="font-size:16px"></span>
+      Tap a dot to assign a Spectra 6 color to each icon state. Changes take effect on next screen refresh.
+    </div>
+
+    <!-- ALARM -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><span class="mdi mdi-shield-home"></span>Alarm</div></div>
+      <div class="card-body">
+        <div class="state-color-grid">
+          <div class="state-row" data-key="alarm_inactive" data-default="0"><span class="state-label">Inactive</span><div class="dot-picker"></div></div>
+          <div class="state-row" data-key="alarm_disarmed" data-default="4"><span class="state-label">Disarmed</span><div class="dot-picker"></div></div>
+          <div class="state-row" data-key="alarm_armed" data-default="2"><span class="state-label">Armed</span><div class="dot-picker"></div></div>
+          <div class="state-row" data-key="alarm_arming" data-default="3"><span class="state-label">Arming</span><div class="dot-picker"></div></div>
+          <div class="state-row" data-key="alarm_triggered" data-default="2"><span class="state-label">Triggered</span><div class="dot-picker"></div></div>
+        </div>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-col-alarm-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveColorCard('alarm')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    <!-- DOORS + WINDOWS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-header"><div class="card-title"><span class="mdi mdi-door-open"></span>Doors</div></div>
+        <div class="card-body">
+          <div class="state-color-grid">
+            <div class="state-row" data-key="door_inactive" data-default="0"><span class="state-label">Inactive</span><div class="dot-picker"></div></div>
+            <div class="state-row" data-key="door_open" data-default="2"><span class="state-label">Open</span><div class="dot-picker"></div></div>
+          </div>
+        </div>
+        <div class="save-row">
+          <span class="save-status" id="save-col-door-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+          <button class="btn-save" onclick="saveColorCard('door')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title"><span class="mdi mdi-window-open"></span>Windows</div></div>
+        <div class="card-body">
+          <div class="state-color-grid">
+            <div class="state-row" data-key="window_inactive" data-default="0"><span class="state-label">Inactive</span><div class="dot-picker"></div></div>
+            <div class="state-row" data-key="window_open" data-default="5"><span class="state-label">Open</span><div class="dot-picker"></div></div>
+          </div>
+        </div>
+        <div class="save-row">
+          <span class="save-status" id="save-col-window-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+          <button class="btn-save" onclick="saveColorCard('window')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLANTS -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><span class="mdi mdi-flower"></span>Plants</div></div>
+      <div class="card-body">
+        <div class="state-color-grid">
+          <div class="state-row" data-key="plant_inactive" data-default="0"><span class="state-label">Inactive</span><div class="dot-picker"></div></div>
+          <div class="state-row" data-key="plant_ok" data-default="0"><span class="state-label">OK</span><div class="dot-picker"></div></div>
+          <div class="state-row" data-key="plant_due" data-default="2"><span class="state-label">Due watering</span><div class="dot-picker"></div></div>
+          <div class="state-row" data-key="plant_watered" data-default="4"><span class="state-label">Recently watered</span><div class="dot-picker"></div></div>
+        </div>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-col-plant-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveColorCard('plant')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    <!-- HEATING + HOT WATER -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-header"><div class="card-title"><span class="mdi mdi-radiator"></span>Heating</div></div>
+        <div class="card-body">
+          <div class="state-color-grid">
+            <div class="state-row" data-key="heating_inactive" data-default="0"><span class="state-label">Inactive</span><div class="dot-picker"></div></div>
+            <div class="state-row" data-key="heating_active" data-default="2"><span class="state-label">Active</span><div class="dot-picker"></div></div>
+          </div>
+        </div>
+        <div class="save-row">
+          <span class="save-status" id="save-col-heating-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+          <button class="btn-save" onclick="saveColorCard('heating')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title"><span class="mdi mdi-water-boiler"></span>Hot Water</div></div>
+        <div class="card-body">
+          <div class="state-color-grid">
+            <div class="state-row" data-key="hotwater_inactive" data-default="0"><span class="state-label">Inactive</span><div class="dot-picker"></div></div>
+            <div class="state-row" data-key="hotwater_active" data-default="2"><span class="state-label">Active</span><div class="dot-picker"></div></div>
+          </div>
+        </div>
+        <div class="save-row">
+          <span class="save-status" id="save-col-hotwater-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+          <button class="btn-save" onclick="saveColorCard('hotwater')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROBOTS -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><span class="mdi mdi-robot-vacuum"></span>Robots</div></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+          <div>
+            <div class="section-divider">Vacuum 1</div>
+            <div class="state-color-grid">
+              <div class="state-row" data-key="vac1_inactive" data-default="0"><span class="state-label">Inactive</span><div class="dot-picker"></div></div>
+              <div class="state-row" data-key="vac1_running" data-default="4"><span class="state-label">Running</span><div class="dot-picker"></div></div>
+              <div class="state-row" data-key="vac1_scheduled" data-default="5"><span class="state-label">Scheduled</span><div class="dot-picker"></div></div>
+              <div class="state-row" data-key="vac1_error" data-default="2"><span class="state-label">Error</span><div class="dot-picker"></div></div>
+            </div>
+          </div>
+          <div>
+            <div class="section-divider">Vacuum 2</div>
+            <div class="state-color-grid">
+              <div class="state-row" data-key="vac2_inactive" data-default="0"><span class="state-label">Inactive</span><div class="dot-picker"></div></div>
+              <div class="state-row" data-key="vac2_running" data-default="4"><span class="state-label">Running</span><div class="dot-picker"></div></div>
+              <div class="state-row" data-key="vac2_scheduled" data-default="5"><span class="state-label">Scheduled</span><div class="dot-picker"></div></div>
+              <div class="state-row" data-key="vac2_error" data-default="2"><span class="state-label">Error</span><div class="dot-picker"></div></div>
+            </div>
+          </div>
+          <div>
+            <div class="section-divider">Mower</div>
+            <div class="state-color-grid">
+              <div class="state-row" data-key="mower_inactive" data-default="0"><span class="state-label">Inactive</span><div class="dot-picker"></div></div>
+              <div class="state-row" data-key="mower_running" data-default="4"><span class="state-label">Running</span><div class="dot-picker"></div></div>
+              <div class="state-row" data-key="mower_scheduled" data-default="5"><span class="state-label">Scheduled</span><div class="dot-picker"></div></div>
+              <div class="state-row" data-key="mower_error" data-default="2"><span class="state-label">Error</span><div class="dot-picker"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-col-robots-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveColorCard('robots')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    <!-- BATTERY BAR -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><span class="mdi mdi-battery-80"></span>Battery Bar</div></div>
+      <div class="card-body">
+        <div class="state-color-grid">
+          <div class="state-row" data-key="battery_charging" data-default="4"><span class="state-label">Charging</span><div class="dot-picker"></div></div>
+          <div class="state-row" data-key="battery_full" data-default="4"><span class="state-label">Full</span><div class="dot-picker"></div></div>
+          <div class="state-row" data-key="battery_discharging" data-default="3"><span class="state-label">Discharging</span><div class="dot-picker"></div></div>
+          <div class="state-row" data-key="battery_critical" data-default="2"><span class="state-label">Critical</span><div class="dot-picker"></div></div>
+          <div class="state-row" data-key="battery_idle" data-default="1"><span class="state-label">Idle</span><div class="dot-picker"></div></div>
+        </div>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-col-battery-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveColorCard('battery')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+  </div><!-- /tab-colors -->
+
+  <!-- ════ TAB 3: DEBUG ════ -->
+  <div class="tab-panel" id="tab-debug">
+
+    <!-- SYSTEM STATUS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-server"></span>System Status</div>
+      </div>
+      <div class="card-body">
+        <div class="debug-grid">
+          <div class="debug-item">
+            <span class="mdi mdi-ip-network debug-icon"></span>
+            <div><div class="debug-label">IP Address</div><div class="debug-value">192.168.1.42</div></div>
+          </div>
+          <div class="debug-item">
+            <span class="mdi mdi-wifi debug-icon"></span>
+            <div><div class="debug-label">WiFi Signal</div><div class="debug-value ok">-61 dBm (Good)</div></div>
+          </div>
+          <div class="debug-item">
+            <span class="mdi mdi-chip debug-icon"></span>
+            <div><div class="debug-label">Firmware</div><div class="debug-value">2025.11.1</div></div>
+          </div>
+          <div class="debug-item">
+            <span class="mdi mdi-timer-outline debug-icon"></span>
+            <div><div class="debug-label">Uptime</div><div class="debug-value">2d 4h 12m</div></div>
+          </div>
+          <div class="debug-item">
+            <span class="mdi mdi-home-assistant debug-icon"></span>
+            <div><div class="debug-label">HA API</div><div class="debug-value ok">Connected</div></div>
+          </div>
+          <div class="debug-item">
+            <span class="mdi mdi-battery-80 debug-icon"></span>
+            <div><div class="debug-label">Device Battery</div><div class="debug-value ok">87% · Charging</div></div>
+          </div>
+          <div class="debug-item">
+            <span class="mdi mdi-thermometer debug-icon"></span>
+            <div><div class="debug-label">Internal Temp</div><div class="debug-value">22.4°C</div></div>
+          </div>
+          <div class="debug-item">
+            <span class="mdi mdi-memory debug-icon"></span>
+            <div><div class="debug-label">Free Heap</div><div class="debug-value warn">142 KB</div></div>
+          </div>
+          <div class="debug-item">
+            <span class="mdi mdi-refresh debug-icon"></span>
+            <div><div class="debug-label">Last Screen Refresh</div><div class="debug-value">14:32:07</div></div>
+          </div>
+          <div class="debug-item">
+            <span class="mdi mdi-counter debug-icon"></span>
+            <div><div class="debug-label">Total Refreshes</div><div class="debug-value">148</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTITY VALUES -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-format-list-checks"></span>Live Entity Values</div>
+      </div>
+      <div class="card-body" style="padding:0">
+        <table class="entity-table">
+          <thead>
+            <tr>
+              <th>Slot</th>
+              <th>Entity ID</th>
+              <th>Value</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="entity-name">Weather</td>
+              <td class="entity-id">weather.home</td>
+              <td class="entity-val">partly-cloudy-day</td>
+              <td><span class="status-pill pill-ok">✓ OK</span></td>
+            </tr>
+            <tr>
+              <td class="entity-name">Temperature</td>
+              <td class="entity-id">weather.home → temperature</td>
+              <td class="entity-val">18.2 °C</td>
+              <td><span class="status-pill pill-ok">✓ OK</span></td>
+            </tr>
+            <tr>
+              <td class="entity-name">Solar Generated</td>
+              <td class="entity-id">sensor.solar_energy_today</td>
+              <td class="entity-val">47.2 kWh</td>
+              <td><span class="status-pill pill-ok">✓ OK</span></td>
+            </tr>
+            <tr>
+              <td class="entity-name">Solar Expected</td>
+              <td class="entity-id">sensor.solar_forecast_today</td>
+              <td class="entity-val">52.0 kWh</td>
+              <td><span class="status-pill pill-ok">✓ OK</span></td>
+            </tr>
+            <tr>
+              <td class="entity-name">Battery SOC</td>
+              <td class="entity-id">sensor.battery_soc</td>
+              <td class="entity-val">87 %</td>
+              <td><span class="status-pill pill-ok">✓ OK</span></td>
+            </tr>
+            <tr>
+              <td class="entity-name">Grid Export</td>
+              <td class="entity-id">sensor.grid_export_today</td>
+              <td class="entity-val">2.1 kWh</td>
+              <td><span class="status-pill pill-ok">✓ OK</span></td>
+            </tr>
+            <tr>
+              <td class="entity-name">Alarm</td>
+              <td class="entity-id">alarm_control_panel.home</td>
+              <td class="entity-val">disarmed</td>
+              <td><span class="status-pill pill-ok">✓ OK</span></td>
+            </tr>
+            <tr>
+              <td class="entity-name">Front Door</td>
+              <td class="entity-id">binary_sensor.front_door</td>
+              <td class="entity-val">on (open)</td>
+              <td><span class="status-pill pill-warn">⚠ Active</span></td>
+            </tr>
+            <tr>
+              <td class="entity-name">Vacuum 1</td>
+              <td class="entity-id">vacuum.downstairs</td>
+              <td class="entity-val">cleaning</td>
+              <td><span class="status-pill pill-ok">✓ Running</span></td>
+            </tr>
+            <tr>
+              <td class="entity-name">Bus Route 42</td>
+              <td class="entity-id">sensor.bus_42_next</td>
+              <td class="entity-val">unavailable</td>
+              <td><span class="status-pill pill-err">✗ Missing</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-play-circle-outline"></span>Actions</div>
+      </div>
+      <div class="card-body">
+        <div class="action-row">
+          <button class="btn-action" onclick="forceRefresh()"><span class="mdi mdi-refresh"></span>Force Screen Refresh</button>
+          <button class="btn-action"><span class="mdi mdi-monitor-screenshot"></span>Refresh Screen 1</button>
+          <button class="btn-action"><span class="mdi mdi-monitor-screenshot"></span>Refresh Screen 2</button>
+          <button class="btn-action"><span class="mdi mdi-download"></span>Export Config JSON</button>
+          <button class="btn-action btn-danger"><span class="mdi mdi-restore"></span>Reset to Defaults</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-debug -->
+
+
+  <!-- ════ TAB 4: CONNECTION ════ -->
+  <div class="tab-panel" id="tab-connection">
+
+    <!-- SECURITY NOTICE -->
+    <div style="display:flex;align-items:flex-start;gap:10px;background:var(--yellow-soft);border:1px solid #fcd34d;border-radius:var(--radius);padding:12px 16px;margin-bottom:16px">
+      <span class="mdi mdi-shield-alert-outline" style="font-size:20px;color:var(--yellow);flex-shrink:0;margin-top:1px"></span>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--yellow);margin-bottom:2px">Sensitive credentials</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.5">
+          These values are stored in ESP32 NVS (encrypted flash). This page is only accessible on your local network while config mode is active. Do not share screenshots of this tab.
+        </div>
+      </div>
+    </div>
+
+    <!-- WIFI -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-wifi"></span>WiFi</div>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-wifi"></span>SSID (Network Name)</div>
+            <input type="text" value="MyHomeNetwork" placeholder="Your WiFi SSID" autocomplete="off" id="wifi-ssid">
+            <div class="field-hint">Case-sensitive. 2.4 GHz only — ESP32-S3 does not support 5 GHz</div>
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-lock-outline"></span>WiFi Password</div>
+            <input type="password" value="••••••••••••" placeholder="WiFi password" autocomplete="off" id="wifi-pass">
+            <div class="field-hint">
+              <span onclick="toggleVis('wifi-pass')" style="cursor:pointer;color:var(--accent)">
+                <span class="mdi mdi-eye-outline"></span> Show / hide
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current WiFi status -->
+        <div style="margin-top:14px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px;display:flex;gap:20px;flex-wrap:wrap">
+          <div class="debug-item" style="padding:0;background:none;border:none">
+            <span class="mdi mdi-wifi debug-icon"></span>
+            <div><div class="debug-label">Current Network</div><div class="debug-value ok">MyHomeNetwork</div></div>
+          </div>
+          <div class="debug-item" style="padding:0;background:none;border:none">
+            <span class="mdi mdi-signal debug-icon"></span>
+            <div><div class="debug-label">Signal</div><div class="debug-value ok">-61 dBm</div></div>
+          </div>
+          <div class="debug-item" style="padding:0;background:none;border:none">
+            <span class="mdi mdi-ip debug-icon"></span>
+            <div><div class="debug-label">Current IP</div><div class="debug-value">192.168.1.42</div></div>
+          </div>
+          <div class="debug-item" style="padding:0;background:none;border:none">
+            <span class="mdi mdi-access-point debug-icon"></span>
+            <div><div class="debug-label">MAC Address</div><div class="debug-value">A4:CF:12:3B:8E:01</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="save-row">
+        <span style="font-size:11px;color:var(--text-muted);flex:1">
+          <span class="mdi mdi-information-outline"></span>
+          WiFi changes take effect on next reboot
+        </span>
+        <span class="save-status" id="save-wifi-status"><span class="mdi mdi-check-circle"></span>Saved — reboot to apply</span>
+        <button class="btn-save" onclick="saveSection('wifi')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    <!-- HOME ASSISTANT -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-home-assistant"></span>Home Assistant</div>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-ip-network"></span>HA IP Address</div>
+            <input type="text" value="192.168.1.10" placeholder="192.168.1.x" id="ha-ip">
+            <div class="field-hint">Local IP of your HA instance</div>
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-numeric"></span>HA Port</div>
+            <input type="text" value="8123" placeholder="8123" id="ha-port">
+            <div class="field-hint">Default is 8123. Change if using reverse proxy</div>
+          </div>
+          <div class="field" style="grid-column: span 2">
+            <div class="field-label"><span class="mdi mdi-key-outline"></span>Long-Lived Access Token</div>
+            <input type="password" value="••••••••••••••••••••••••••••••••••••••••" placeholder="Paste token from HA Profile → Long-Lived Access Tokens" autocomplete="off" id="ha-token">
+            <div class="field-hint">
+              In HA: Profile (bottom left) → Security tab → Create Token &nbsp;·&nbsp;
+              <span onclick="toggleVis('ha-token')" style="cursor:pointer;color:var(--accent)">
+                <span class="mdi mdi-eye-outline"></span> Show / hide
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- HA connection status -->
+        <div style="margin-top:14px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;gap:12px">
+          <span class="mdi mdi-check-circle" style="font-size:18px;color:var(--green)"></span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--green)">Connected to Home Assistant</div>
+            <div style="font-size:11px;color:var(--text-muted);font-family:var(--mono)">http://192.168.1.10:8123 · API responding · 148 entities available</div>
+          </div>
+          <button class="btn-action" style="margin-left:auto;padding:5px 12px;font-size:12px">
+            <span class="mdi mdi-lan-check"></span> Test Connection
+          </button>
+        </div>
+      </div>
+      <div class="save-row">
+        <span class="save-status" id="save-ha-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveSection('ha')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    <!-- ESPHOME NATIVE API -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-api"></span>ESPHome Native API</div>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field" style="grid-column: span 2">
+            <div class="field-label"><span class="mdi mdi-lock-outline"></span>API Encryption Key</div>
+            <input type="password" value="••••••••••••••••••••••••••••••••••••••••••••" placeholder="Base64 encryption key from your ESPHome YAML" autocomplete="off" id="api-key">
+            <div class="field-hint">
+              Found in your <code style="font-family:var(--mono);background:var(--bg);padding:1px 5px;border-radius:3px">secrets.yaml</code> as <code style="font-family:var(--mono);background:var(--bg);padding:1px 5px;border-radius:3px">api_encryption_key</code> &nbsp;·&nbsp;
+              <span onclick="toggleVis('api-key')" style="cursor:pointer;color:var(--accent)">
+                <span class="mdi mdi-eye-outline"></span> Show / hide
+              </span>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-update"></span>OTA Password</div>
+            <input type="password" value="••••••••••••" placeholder="OTA update password" autocomplete="off" id="ota-pass">
+            <div class="field-hint">
+              <span onclick="toggleVis('ota-pass')" style="cursor:pointer;color:var(--accent)">
+                <span class="mdi mdi-eye-outline"></span> Show / hide
+              </span>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><span class="mdi mdi-web"></span>Fallback Hotspot Password</div>
+            <input type="password" value="••••••••••••" placeholder="AP fallback password" autocomplete="off" id="ap-pass">
+            <div class="field-hint">
+              Used if WiFi fails — device creates its own hotspot &nbsp;·&nbsp;
+              <span onclick="toggleVis('ap-pass')" style="cursor:pointer;color:var(--accent)">
+                <span class="mdi mdi-eye-outline"></span> Show / hide
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- API status -->
+        <div style="margin-top:14px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;gap:12px">
+          <span class="mdi mdi-check-circle" style="font-size:18px;color:var(--green)"></span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--green)">Native API active</div>
+            <div style="font-size:11px;color:var(--text-muted);font-family:var(--mono)">HA has this device registered · Last seen 14:32</div>
+          </div>
+        </div>
+      </div>
+      <div class="save-row">
+        <span style="font-size:11px;color:var(--text-muted);flex:1">
+          <span class="mdi mdi-information-outline"></span>
+          API key changes require reflash via USB
+        </span>
+        <span class="save-status" id="save-api-status"><span class="mdi mdi-check-circle"></span>Saved</span>
+        <button class="btn-save" onclick="saveSection('api')"><span class="mdi mdi-content-save-outline"></span>Save</button>
+      </div>
+    </div>
+
+    <!-- REBOOT -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="mdi mdi-restart"></span>Device Control</div>
+      </div>
+      <div class="card-body">
+        <div class="action-row">
+          <button class="btn-action" onclick="reboot()">
+            <span class="mdi mdi-restart"></span>Reboot Device
+          </button>
+          <button class="btn-action btn-danger" onclick="factoryReset()">
+            <span class="mdi mdi-restore"></span>Factory Reset
+          </button>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text-faint)">
+          Factory reset clears all NVS config. Device will reboot into fallback hotspot mode. Credentials in ESPHome YAML remain unchanged.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-connection -->
+
+</div><!-- /content -->
+
+<script>
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+function updateIcon(slot, value) {
+  const el = document.getElementById('prev-' + slot);
+  if (el) el.className = 'mdi mdi-' + value;
+}
+
+// -- BASE URL ------------------------------------------------
+// When served from the device, window.location.origin is the device IP.
+// Falls back to a placeholder so the mockup still renders.
+const BASE_URL = window.location.hostname === 'localhost' ||
+                 window.location.hostname === ''
+  ? 'http://192.168.1.42'
+  : window.location.origin;
+
+// -- TIMEOUT BADGE -------------------------------------------
+function resetTimeoutBadge() {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() + 10);
+  const h = now.getHours().toString().padStart(2,'0');
+  const m = now.getMinutes().toString().padStart(2,'0');
+  const badge = document.querySelector('.timeout-badge');
+  if (badge) badge.innerHTML =
+    '<span class="mdi mdi-timer-outline"></span> Config closes at ' + h + ':' + m;
+}
+
+// -- GENERIC API POST ----------------------------------------
+async function apiPost(endpoint, payload) {
+  const res = await fetch(BASE_URL + endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+// -- SHOW SAVE STATUS ----------------------------------------
+function showSaveStatus(id, ok) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = ok
+    ? '<span class="mdi mdi-check-circle"></span> Saved'
+    : '<span class="mdi mdi-alert-circle" style="color:var(--red)"></span> Error';
+  el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), 3000);
+}
+
+// -- COLLECT INPUTS FROM A CARD ------------------------------
+function collectInputs(cardSelector) {
+  const payload = {};
+  document.querySelectorAll(cardSelector + ' input, ' +
+                             cardSelector + ' select').forEach(el => {
+    if (el.name) payload[el.name] = el.type === 'number'
+      ? Number(el.value) : el.value;
+  });
+  return payload;
+}
+
+// -- SECTION SAVE HANDLERS -----------------------------------
+async function saveSection(section) {
+  resetTimeoutBadge();
+  const statusId = 'save-' + section + '-status';
+
+  try {
+    let endpoint, payload;
+
+    switch (section) {
+      case 'weather':
+      case 'solar':
+      case 'rooms':
+      case 'icons':     // status icon sensors
+      case 'presence':
+      case 'calendar':
+        // All sensor sections POST to /api/config/sensors
+        payload = collectInputs('[data-section="' + section + '"]');
+        // Map field names to API keys via data-apikey attributes
+        payload = gatherSensorPayload(section);
+        endpoint = '/api/config/sensors';
+        break;
+
+      case 'thresholds':
+        payload = {
+          battery_critical:  parseInt(document.querySelector('[data-threshold="battery_critical"]')?.value || 10),
+          battery_low:       parseInt(document.querySelector('[data-threshold="battery_low"]')?.value || 20),
+          solar_peak:        parseInt(document.querySelector('[data-threshold="solar_peak"]')?.value || 52),
+          transport_urgent:  parseInt(document.querySelector('[data-threshold="transport_urgent"]')?.value || 5),
+          motion_recent:     parseInt(document.querySelector('[data-threshold="motion_recent"]')?.value || 30),
+          climate_tolerance: parseInt(document.querySelector('[data-threshold="climate_tolerance"]')?.value || 1),
+          config_timeout:    parseInt(document.querySelector('[data-threshold="config_timeout"]')?.value || 600),
+          longpress_ms:      parseInt(document.querySelector('[data-threshold="longpress_ms"]')?.value || 800),
+        };
+        endpoint = '/api/config/thresholds';
+        break;
+
+      case 'iconnames':
+        payload = gatherIconPayload();
+        endpoint = '/api/config/icons';
+        break;
+
+      case 'wifi':
+        payload = {
+          ssid:     document.getElementById('wifi-ssid')?.value || '',
+          password: document.getElementById('wifi-pass')?.value || '',
+        };
+        endpoint = '/api/config/wifi';
+        break;
+
+      case 'ha':
+        payload = {
+          ip:    document.getElementById('ha-ip')?.value    || '',
+          port:  parseInt(document.getElementById('ha-port')?.value || '8123'),
+          token: document.getElementById('ha-token')?.value || '',
+        };
+        endpoint = '/api/config/ha';
+        break;
+
+      case 'api':
+        // OTA/AP passwords saved via a separate mechanism — just ack
+        showSaveStatus(statusId, true);
+        return;
+
+      default:
+        showSaveStatus(statusId, false);
+        return;
+    }
+
+    await apiPost(endpoint, payload);
+    showSaveStatus(statusId, true);
+
+  } catch (err) {
+    console.error('Save failed:', section, err);
+    showSaveStatus(statusId, false);
+  }
+}
+
+// -- GATHER SENSOR PAYLOAD -----------------------------------
+// Reads inputs by data-sensor attribute within each card
+function gatherSensorPayload(section) {
+  const payload = {};
+  document.querySelectorAll('[data-sensor]').forEach(el => {
+    payload[el.dataset.sensor] = el.value.trim();
+  });
+  return payload;
+}
+
+// -- GATHER ICON NAME PAYLOAD --------------------------------
+function gatherIconPayload() {
+  const payload = {};
+  document.querySelectorAll('[data-icon-slot]').forEach(el => {
+    payload[el.dataset.iconSlot] = el.value.trim();
+  });
+  return payload;
+}
+
+// -- COLOR DOT PICKER ----------------------------------------
+const PALETTE = [
+  { idx: 0, cls: 'dot-grey',   label: 'Grey'   },
+  { idx: 1, cls: 'dot-black',  label: 'Black'  },
+  { idx: 2, cls: 'dot-red',    label: 'Red'    },
+  { idx: 3, cls: 'dot-yellow', label: 'Yellow' },
+  { idx: 4, cls: 'dot-green',  label: 'Green'  },
+  { idx: 5, cls: 'dot-blue',   label: 'Blue'   },
+];
+
+const colorState = {};
+
+function initDotPickers() {
+  document.querySelectorAll('.state-row').forEach(row => {
+    const key        = row.dataset.key;
+    const defaultVal = parseInt(row.dataset.default ?? '1');
+    colorState[key]  = defaultVal;
+
+    const picker = row.querySelector('.dot-picker');
+    picker.innerHTML = '';
+
+    PALETTE.forEach(p => {
+      const dot = document.createElement('div');
+      dot.className   = 'color-dot ' + p.cls;
+      dot.title       = p.label;
+      dot.dataset.idx = p.idx;
+      if (p.idx === defaultVal) dot.classList.add('selected');
+      dot.addEventListener('click', () => {
+        picker.querySelectorAll('.color-dot').forEach(d =>
+          d.classList.remove('selected'));
+        dot.classList.add('selected');
+        colorState[key] = p.idx;
+      });
+      picker.appendChild(dot);
+    });
+  });
+}
+
+async function saveColorCard(card) {
+  resetTimeoutBadge();
+  const statusId = 'save-col-' + card + '-status';
+
+  // Collect only the keys for this card
+  const prefix = card === 'robots'
+    ? ['vac1_', 'vac2_', 'mower_']
+    : [card + '_'];
+
+  const payload = {};
+  Object.entries(colorState).forEach(([k, v]) => {
+    if (prefix.some(p => k.startsWith(p))) payload[k] = v;
+  });
+
+  try {
+    await apiPost('/api/config/colors', payload);
+    showSaveStatus(statusId, true);
+  } catch (err) {
+    console.error('Color save failed:', card, err);
+    showSaveStatus(statusId, false);
+  }
+}
+
+// -- LOAD CONFIG FROM DEVICE ON PAGE LOAD --------------------
+async function loadConfig() {
+  try {
+    const res = await fetch(BASE_URL + '/api/config');
+    if (!res.ok) return;
+    const cfg = await res.json();
+
+    // Populate sensor inputs
+    if (cfg.sensors) {
+      Object.entries(cfg.sensors).forEach(([key, val]) => {
+        const el = document.querySelector('[data-sensor="' + key + '"]');
+        if (el) el.value = val;
+      });
+    }
+
+    // Populate threshold sliders
+    if (cfg.thresholds) {
+      Object.entries(cfg.thresholds).forEach(([key, val]) => {
+        const el = document.querySelector('[data-threshold="' + key + '"]');
+        if (el) {
+          el.value = val;
+          // Update displayed value
+          if (el.nextElementSibling) el.nextElementSibling.textContent =
+            el.type === 'range' ? val + (key.includes('ms') ? ' ms' :
+              key.includes('peak') ? ' kWh' :
+              key.includes('timeout') ? ' s' : '%') : val;
+        }
+      });
+    }
+
+    // Populate color dots
+    if (cfg.colors) {
+      Object.entries(cfg.colors).forEach(([key, val]) => {
+        colorState[key] = val;
+        const row = document.querySelector('[data-key="' + key + '"]');
+        if (row) {
+          row.querySelectorAll('.color-dot').forEach(d => {
+            d.classList.toggle('selected', parseInt(d.dataset.idx) === val);
+          });
+        }
+      });
+    }
+
+    // Populate icon inputs
+    if (cfg.icons) {
+      Object.entries(cfg.icons).forEach(([key, val]) => {
+        const el = document.querySelector('[data-icon-slot="' + key + '"]');
+        if (el) {
+          el.value = val;
+          updateIcon(key, val);
+        }
+      });
+    }
+
+    // Update device status
+    if (cfg.status) {
+      const ipEls = document.querySelectorAll('[data-status="ip"]');
+      ipEls.forEach(el => el.textContent = cfg.status.ip);
+      const rssiEl = document.querySelector('[data-status="rssi"]');
+      if (rssiEl) rssiEl.textContent = cfg.status.rssi + ' dBm';
+    }
+
+    console.log('Config loaded from device');
+  } catch (err) {
+    console.warn('Could not load config from device (offline?):', err);
+  }
+}
+
+// -- ACTIONS -------------------------------------------------
+async function forceRefresh() {
+  try {
+    await apiPost('/api/action/refresh', {});
+    alert('Refresh triggered');
+  } catch (e) { alert('Failed: ' + e.message); }
+}
+
+async function reboot() {
+  if (!confirm('Reboot the device now?')) return;
+  try {
+    await apiPost('/api/action/restart', {});
+    alert('Rebooting... reconnect in ~15 seconds.');
+  } catch (e) { /* expected — connection drops */ }
+}
+
+async function factoryReset() {
+  if (!confirm('Erase ALL saved config?')) return;
+  if (!confirm('Really? This cannot be undone.')) return;
+  // Factory reset clears NVS — implement via a dedicated endpoint if needed
+  alert('Not yet implemented in firmware.');
+}
+
+// -- INIT ----------------------------------------------------
+
+async function saveAlerts() {
+  const payload = {};
+  document.querySelectorAll('[data-slot]').forEach(el => {
+    const n = el.dataset.slot;
+    if (!n) return;
+    const entities = [];
+    const names = [];
+    for (let e = 1; e <= 8; e++) {
+      const eid = el.querySelector(`[data-alert-entity="${n}-${e}"]`)?.value.trim() || '';
+      const ename = el.querySelector(`[data-alert-name="${n}-${e}"]`)?.value.trim() || '';
+      entities.push(eid);
+      names.push(ename);
+    }
+    payload[n] = {
+      cond:     el.querySelector(`[data-alert-cond="${n}"]`)?.value || 'eq',
+      value:    el.querySelector(`[data-alert-value="${n}"]`)?.value.trim() || 'on',
+      suffix:   el.querySelector(`[data-alert-suffix="${n}"]`)?.value.trim() || '',
+      enabled:  el.querySelector(`[data-alert-enabled="${n}"]`)?.checked ? 1 : 0,
+      entities: entities,
+      names:    names,
+    };
+  });
+  try {
+    await apiPost('/api/config/alerts', payload);
+    showSaveStatus('save-alerts-status', true);
+  } catch(e) {
+    showSaveStatus('save-alerts-status', false);
+  }
+  resetTimeoutBadge();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initDotPickers();
+  loadConfig();
+});
+
+
+// Init pickers on load
+document.addEventListener('DOMContentLoaded', initDotPickers);
+
+
+  const el = document.getElementById(id);
+  if (el) el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+function reboot() {
+  if (confirm('Reboot the device now? You will lose connection briefly.')) {
+    alert('Rebooting… reconnect in ~15 seconds.');
+  }
+}
+
+function factoryReset() {
+  if (confirm('⚠️ This will erase ALL saved config from the device. Are you sure?')) {
+    if (confirm('Really? All entity IDs, credentials and thresholds will be lost.')) {
+      alert('Factory reset triggered. Device rebooting into fallback hotspot mode.');
+    }
+  }
+}
+
+// Countdown timer — ticks every minute, resets on any save
+let closeTime = new Date();
+closeTime.setMinutes(closeTime.getMinutes() + 10);
+
+function updateTimeout() {
+  const now = new Date();
+  const diff = Math.round((closeTime - now) / 60000);
+  if (diff <= 0) {
+    document.querySelector('.timeout-badge').innerHTML =
+      '<span class="mdi mdi-timer-off"></span> Closing...';
+  }
+}
+setInterval(updateTimeout, 30000);
+</script>
+
+</body>
+</html>

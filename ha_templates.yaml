@@ -1,0 +1,434 @@
+# ============================================================
+#  ha_templates.yaml
+#  Kitchen Panel — Home Assistant template sensors
+#
+#  Add this file to your HA config via:
+#    homeassistant:
+#      packages:
+#        kitchen_panel: !include ha_templates.yaml
+#
+#  Or paste the sensor/template_sensor/binary_sensor blocks
+#  directly into your configuration.yaml.
+# ============================================================
+
+# -- WEATHER FORECAST SENSORS ---------------------------------
+# These break the HA forecast array into individual sensors
+# that ESPHome can subscribe to as text_sensors.
+#
+# Replace 'weather.home' with your weather entity ID.
+
+template:
+  - sensor:
+      # "Later today" forecast — next entry in forecast list
+      - name: "Forecast Later Condition"
+        unique_id: panel_forecast_later_condition
+        state: >
+          {% set f = state_attr('weather.home', 'forecast') %}
+          {% if f and f | length > 0 %}
+            {{ f[0].condition }}
+          {% else %}unknown{% endif %}
+
+      - name: "Forecast Later Temp"
+        unique_id: panel_forecast_later_temp
+        state: >
+          {% set f = state_attr('weather.home', 'forecast') %}
+          {% if f and f | length > 0 %}
+            {{ f[0].temperature | round(0) }}°
+          {% else %}--{% endif %}
+
+      # Day 1 forecast (tomorrow)
+      - name: "Forecast Day1 Condition"
+        unique_id: panel_forecast_day1_condition
+        state: >
+          {% set f = state_attr('weather.home', 'forecast') %}
+          {% if f and f | length > 1 %}
+            {{ f[1].condition }}
+          {% else %}unknown{% endif %}
+
+      - name: "Forecast Day1 Temp"
+        unique_id: panel_forecast_day1_temp
+        state: >
+          {% set f = state_attr('weather.home', 'forecast') %}
+          {% if f and f | length > 1 %}
+            {{ f[1].temperature | round(0) }}°
+          {% else %}--{% endif %}
+
+      - name: "Forecast Day1 Label"
+        unique_id: panel_forecast_day1_label
+        state: >
+          {% set f = state_attr('weather.home', 'forecast') %}
+          {% if f and f | length > 1 %}
+            {{ as_datetime(f[1].datetime).strftime('%a') | upper }}
+          {% else %}---{% endif %}
+
+      # Day 2 forecast (day after tomorrow)
+      - name: "Forecast Day2 Condition"
+        unique_id: panel_forecast_day2_condition
+        state: >
+          {% set f = state_attr('weather.home', 'forecast') %}
+          {% if f and f | length > 2 %}
+            {{ f[2].condition }}
+          {% else %}unknown{% endif %}
+
+      - name: "Forecast Day2 Temp"
+        unique_id: panel_forecast_day2_temp
+        state: >
+          {% set f = state_attr('weather.home', 'forecast') %}
+          {% if f and f | length > 2 %}
+            {{ f[2].temperature | round(0) }}°
+          {% else %}--{% endif %}
+
+      - name: "Forecast Day2 Label"
+        unique_id: panel_forecast_day2_label
+        state: >
+          {% set f = state_attr('weather.home', 'forecast') %}
+          {% if f and f | length > 2 %}
+            {{ as_datetime(f[2].datetime).strftime('%a') | upper }}
+          {% else %}---{% endif %}
+
+      # -- ALERT LINES FOR SCREEN 1 ---------------------------
+      # Pre-formatted strings. ESPHome reads these as text_sensors.
+      # Adjust entity IDs to match your setup.
+      # Format: "[icon codepoint]  Description"
+      # Icons are rendered as MDI glyphs in display_lambda.h
+      # Keep each line under ~40 chars for font_medium at 560px width
+
+      - name: "Panel Alert Line 1"
+        unique_id: panel_alert_line_1
+        state: >
+          {# Front door open #}
+          {% if is_state('binary_sensor.front_door', 'on') %}
+            Front door open
+          {% elif is_state('binary_sensor.back_door', 'on') %}
+            Back door open
+          {% else %}{% endif %}
+
+      - name: "Panel Alert Line 2"
+        unique_id: panel_alert_line_2
+        state: >
+          {# Windows — count how many open #}
+          {% set windows = [
+            'binary_sensor.kitchen_window',
+            'binary_sensor.living_window',
+            'binary_sensor.bedroom_window'
+          ] %}
+          {% set open_count = windows | select('is_state', 'on') | list | count %}
+          {% if open_count == 1 %}
+            1 window open
+          {% elif open_count > 1 %}
+            {{ open_count }} windows open
+          {% else %}{% endif %}
+
+      - name: "Panel Alert Line 3"
+        unique_id: panel_alert_line_3
+        state: >
+          {# Plant watering due #}
+          {% if is_state('sensor.plant_watering_status', 'due') %}
+            Plants need watering
+          {% else %}{% endif %}
+
+      - name: "Panel Alert Line 4"
+        unique_id: panel_alert_line_4
+        state: >
+          {# Hot water heating #}
+          {% if is_state('binary_sensor.hot_water_active', 'on') %}
+            Hot water heating
+          {% elif is_state('binary_sensor.heating_active', 'on') %}
+            Heating active
+          {% else %}{% endif %}
+
+      # -- CALENDAR LINES FOR SCREEN 1 ------------------------
+      # Pull from Google Calendar + HA input_booleans / schedules
+      # Format: "HH:MM  Event description" or "     All day event"
+      # Replace calendar.home_calendar with your calendar entity
+
+      - name: "Panel Cal Line 1"
+        unique_id: panel_cal_line_1
+        state: >
+          {% set events = state_attr('calendar.home_calendar', 'upcoming_events') %}
+          {% if events and events | length > 0 %}
+            {% set e = events[0] %}
+            {% set dt = as_datetime(e.start) %}
+            {% if dt.date() == now().date() %}
+              {{ dt.strftime('%H:%M') }}  {{ e.summary | truncate(28, true) }}
+            {% else %}{% endif %}
+          {% else %}{% endif %}
+
+      - name: "Panel Cal Line 2"
+        unique_id: panel_cal_line_2
+        state: >
+          {% set events = state_attr('calendar.home_calendar', 'upcoming_events') %}
+          {% if events and events | length > 1 %}
+            {% set e = events[1] %}
+            {% set dt = as_datetime(e.start) %}
+            {% if dt.date() == now().date() %}
+              {{ dt.strftime('%H:%M') }}  {{ e.summary | truncate(28, true) }}
+            {% else %}{% endif %}
+          {% else %}{% endif %}
+
+      - name: "Panel Cal Line 3"
+        unique_id: panel_cal_line_3
+        state: >
+          {# HA schedule automations — add yours here #}
+          {# Example: vacuum schedule from input_datetime #}
+          {% if is_state('input_boolean.vacuum1_runs_today', 'on') %}
+            {{ states('input_datetime.vacuum1_schedule') | truncate(5,true,'') }}  Vacuum 1 scheduled
+          {% else %}{% endif %}
+
+      - name: "Panel Cal Line 4"
+        unique_id: panel_cal_line_4
+        state: >
+          {# Bin collection example #}
+          {% if is_state('binary_sensor.bin_collection_today', 'on') %}
+               Bin collection today
+          {% else %}{% endif %}
+
+      # -- MEDIA PLAYER SENSORS FOR SCREEN 2 -----------------
+      # Flattens media_player state into two readable strings
+
+      - name: "Panel Media1 Title"
+        unique_id: panel_media1_title
+        state: >
+          {% set mp = 'media_player.bedroom' %}
+          {% if not is_state(mp, 'off') and not is_state(mp, 'idle')
+                and not is_state(mp, 'unavailable') %}
+            {{ state_attr(mp, 'media_title') or state_attr(mp, 'media_album_name') or '' }}
+          {% else %}{% endif %}
+
+      - name: "Panel Media1 Room"
+        unique_id: panel_media1_room
+        state: >
+          {% set mp = 'media_player.bedroom' %}
+          {% if not is_state(mp, 'off') and not is_state(mp, 'idle')
+                and not is_state(mp, 'unavailable') %}
+            Bedroom · {{ state_attr(mp, 'app_name') or state_attr(mp, 'source') or states(mp) }}
+          {% else %}{% endif %}
+
+      - name: "Panel Media2 Title"
+        unique_id: panel_media2_title
+        state: >
+          {% set mp = 'media_player.living_room_tv' %}
+          {% if not is_state(mp, 'off') and not is_state(mp, 'idle')
+                and not is_state(mp, 'unavailable') %}
+            {{ state_attr(mp, 'media_title') or state_attr(mp, 'media_series_title') or '' }}
+          {% else %}{% endif %}
+
+      - name: "Panel Media2 Room"
+        unique_id: panel_media2_room
+        state: >
+          {% set mp = 'media_player.living_room_tv' %}
+          {% if not is_state(mp, 'off') and not is_state(mp, 'idle')
+                and not is_state(mp, 'unavailable') %}
+            Living Room · {{ state_attr(mp, 'app_name') or state_attr(mp, 'source') or states(mp) }}
+          {% else %}{% endif %}
+
+      # -- MOTION SENSOR TIME FORMATTERS FOR SCREEN 2 ---------
+      # For each motion sensor, expose:
+      #   sensor.panel_motionN_name  — room name string
+      #   sensor.panel_motionN_time  — last triggered HH:MM or "—"
+      # And a binary_sensor for "recent" (within threshold)
+      #
+      # Replace binary_sensor.xxx_motion with your entity IDs
+      # and the names with your room names.
+
+      # Motion 1 — Living Room
+      - name: "Panel Motion1 Name"
+        unique_id: panel_motion1_name
+        state: "Living Room"
+
+      - name: "Panel Motion1 Time"
+        unique_id: panel_motion1_time
+        state: >
+          {% set s = states.binary_sensor.living_room_motion %}
+          {% if s and s.last_changed %}
+            {% set dt = as_datetime(s.last_changed).astimezone() %}
+            {% if dt.date() == now().date() %}
+              {{ dt.strftime('%H:%M') }}
+            {% else %}
+              {{ dt.strftime('%a %H:%M') }}
+            {% endif %}
+          {% else %}—{% endif %}
+
+      # Motion 2 — Kitchen
+      - name: "Panel Motion2 Name"
+        unique_id: panel_motion2_name
+        state: "Kitchen"
+
+      - name: "Panel Motion2 Time"
+        unique_id: panel_motion2_time
+        state: >
+          {% set s = states.binary_sensor.kitchen_motion %}
+          {% if s and s.last_changed %}
+            {% set dt = as_datetime(s.last_changed).astimezone() %}
+            {% if dt.date() == now().date() %}
+              {{ dt.strftime('%H:%M') }}
+            {% else %}
+              {{ dt.strftime('%a %H:%M') }}
+            {% endif %}
+          {% else %}—{% endif %}
+
+      # Motion 3 — Hall
+      - name: "Panel Motion3 Name"
+        unique_id: panel_motion3_name
+        state: "Hall"
+
+      - name: "Panel Motion3 Time"
+        unique_id: panel_motion3_time
+        state: >
+          {% set s = states.binary_sensor.hall_motion %}
+          {% if s and s.last_changed %}
+            {% set dt = as_datetime(s.last_changed).astimezone() %}
+            {% if dt.date() == now().date() %}
+              {{ dt.strftime('%H:%M') }}
+            {% else %}
+              {{ dt.strftime('%a %H:%M') }}
+            {% endif %}
+          {% else %}—{% endif %}
+
+      # Motion 4 — Main Bedroom
+      - name: "Panel Motion4 Name"
+        unique_id: panel_motion4_name
+        state: "Main Bed"
+
+      - name: "Panel Motion4 Time"
+        unique_id: panel_motion4_time
+        state: >
+          {% set s = states.binary_sensor.main_bedroom_motion %}
+          {% if s and s.last_changed %}
+            {% set dt = as_datetime(s.last_changed).astimezone() %}
+            {% if dt.date() == now().date() %}
+              {{ dt.strftime('%H:%M') }}
+            {% else %}
+              {{ dt.strftime('%a %H:%M') }}
+            {% endif %}
+          {% else %}—{% endif %}
+
+      # Motion 5 — Office
+      - name: "Panel Motion5 Name"
+        unique_id: panel_motion5_name
+        state: "Office"
+
+      - name: "Panel Motion5 Time"
+        unique_id: panel_motion5_time
+        state: >
+          {% set s = states.binary_sensor.office_motion %}
+          {% if s and s.last_changed %}
+            {% set dt = as_datetime(s.last_changed).astimezone() %}
+            {% if dt.date() == now().date() %}
+              {{ dt.strftime('%H:%M') }}
+            {% else %}
+              {{ dt.strftime('%a %H:%M') }}
+            {% endif %}
+          {% else %}—{% endif %}
+
+      # Motion 6 — Garden / Outdoor (optional, leave blank to hide)
+      - name: "Panel Motion6 Name"
+        unique_id: panel_motion6_name
+        state: "Garden"
+
+      - name: "Panel Motion6 Time"
+        unique_id: panel_motion6_time
+        state: >
+          {% set s = states.binary_sensor.garden_motion %}
+          {% if s and s.last_changed %}
+            {% set dt = as_datetime(s.last_changed).astimezone() %}
+            {% if dt.date() == now().date() %}
+              {{ dt.strftime('%H:%M') }}
+            {% else %}
+              {{ dt.strftime('%a %H:%M') }}
+            {% endif %}
+          {% else %}—{% endif %}
+
+  # -- MOTION RECENT BINARY SENSORS ---------------------------
+  # "on" if last motion was within 30 minutes (adjust threshold here)
+  # This threshold should match id(motion_recent_mins) in ESPHome.
+  # ESPHome reads these as text_sensors (state = "on" or "off")
+
+  - binary_sensor:
+      - name: "Panel Motion1 Recent"
+        unique_id: panel_motion1_recent
+        state: >
+          {% set s = states.binary_sensor.living_room_motion %}
+          {% if s and s.last_changed %}
+            {{ (now() - as_datetime(s.last_changed).astimezone()).seconds < 1800 }}
+          {% else %}false{% endif %}
+
+      - name: "Panel Motion2 Recent"
+        unique_id: panel_motion2_recent
+        state: >
+          {% set s = states.binary_sensor.kitchen_motion %}
+          {% if s and s.last_changed %}
+            {{ (now() - as_datetime(s.last_changed).astimezone()).seconds < 1800 }}
+          {% else %}false{% endif %}
+
+      - name: "Panel Motion3 Recent"
+        unique_id: panel_motion3_recent
+        state: >
+          {% set s = states.binary_sensor.hall_motion %}
+          {% if s and s.last_changed %}
+            {{ (now() - as_datetime(s.last_changed).astimezone()).seconds < 1800 }}
+          {% else %}false{% endif %}
+
+      - name: "Panel Motion4 Recent"
+        unique_id: panel_motion4_recent
+        state: >
+          {% set s = states.binary_sensor.main_bedroom_motion %}
+          {% if s and s.last_changed %}
+            {{ (now() - as_datetime(s.last_changed).astimezone()).seconds < 1800 }}
+          {% else %}false{% endif %}
+
+      - name: "Panel Motion5 Recent"
+        unique_id: panel_motion5_recent
+        state: >
+          {% set s = states.binary_sensor.office_motion %}
+          {% if s and s.last_changed %}
+            {{ (now() - as_datetime(s.last_changed).astimezone()).seconds < 1800 }}
+          {% else %}false{% endif %}
+
+      - name: "Panel Motion6 Recent"
+        unique_id: panel_motion6_recent
+        state: >
+          {% set s = states.binary_sensor.garden_motion %}
+          {% if s and s.last_changed %}
+            {{ (now() - as_datetime(s.last_changed).astimezone()).seconds < 1800 }}
+          {% else %}false{% endif %}
+
+# -- SECRETS REFERENCE ----------------------------------------
+# Your ESPHome secrets.yaml should contain:
+#
+#  wifi_ssid: "YourSSID"
+#  wifi_password: "YourPassword"
+#  api_encryption_key: "base64keyhere=="
+#  ota_password: "your_ota_password"
+#  ap_password: "fallback_ap_password"
+#
+# -- DEPENDENCIES ---------------------------------------------
+# kitchen-panel.yaml requires:
+#   - ESPHome 2025.11.1 or later
+#   - materialdesignicons-webfont.ttf in your ESPHome config dir
+#     Download: https://github.com/Templarian/MaterialDesign-Webfont/
+#     File: fonts/materialdesignicons-webfont.ttf
+#   - display_lambda.h in your ESPHome config dir (this package)
+#   - ha_templates.yaml loaded in HA (this file)
+#
+# -- GOOGLE CALENDAR SETUP ------------------------------------
+# 1. Add Google Calendar integration in HA Settings > Devices
+# 2. Note your calendar entity ID (e.g. calendar.home_calendar)
+# 3. Update the entity IDs in Panel Cal Line 1/2 sensors above
+# 4. The integration exposes 'upcoming_events' as an attribute
+#    containing a list of {start, end, summary, description}
+#
+# -- TRANSPORT SETUP ------------------------------------------
+# Use the 'Public Transport' (Rejseplanen), 'GTFS', or your
+# country's HA transport integration.
+# Each route needs two sensors: next departure and the one after.
+# Format the state as "HH:MM" for best display results.
+# Example automation to create sensor from integration:
+#
+#   template:
+#     - sensor:
+#         - name: "Bus 42 Next"
+#           state: >
+#             {{ state_attr('sensor.bus_stop_departures',
+#                'next_departures') | selectattr('line','eq','42')
+#                | map(attribute='time') | first | default('--') }}

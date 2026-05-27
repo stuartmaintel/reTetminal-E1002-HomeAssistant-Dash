@@ -1,0 +1,25 @@
+# ESPHome secrets — NEVER commit these
+secrets.yaml
+
+# ESPHome build cache
+.esphome/
+build/
+*.bin
+*.elf
+*.map
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python
+__pycache__/
+*.pyc

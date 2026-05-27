@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kitchen Panel — All Screens</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.2.96/css/materialdesignicons.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=DM+Mono:wght@500&display=swap');
+
+/* ── GALLERY SHELL ─────────────────────────────────────── */
+:root {
+  --bg:      #141414;
+  --surface: #1e1e1e;
+  --border:  #2e2e2e;
+  --text:    #f0ede8;
+  --muted:   #666;
+  --eink-bg: #f0ede8;
+  --eink-black: #1a1a1a;
+  --eink-red:   #c0392b;
+  --eink-yellow:#e6b800;
+  --eink-green: #2e7d32;
+  --eink-blue:  #1a5fa8;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Atkinson Hyperlegible',sans-serif; min-height:100vh; }
+
+.g-header { padding:32px 40px 20px; border-bottom:1px solid var(--border); display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.g-tag { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
+.g-title { font-size:32px; font-weight:700; letter-spacing:-0.5px; }
+.g-pills { display:flex; gap:8px; flex-wrap:wrap; }
+.g-pill { display:flex; align-items:center; gap:5px; padding:5px 12px; background:var(--surface); border:1px solid var(--border); border-radius:20px; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
+.g-pill .mdi { font-size:13px; }
+
+.g-palette { display:flex; align-items:center; gap:6px; padding:12px 40px; border-bottom:1px solid var(--border); }
+.g-plabel { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-right:8px; }
+.g-pdot { width:18px; height:18px; border-radius:50%; flex-shrink:0; }
+.g-pname { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); margin-right:12px; }
+
+.g-btns { display:flex; align-items:center; gap:20px; padding:11px 40px; border-bottom:1px solid var(--border); background:var(--surface); flex-wrap:wrap; }
+.g-btn-item { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--muted); font-family:'DM Mono',monospace; }
+.g-chip { padding:3px 10px; background:#2a2a2a; border:1px solid #3a3a3a; border-radius:4px; font-size:11px; color:var(--text); }
+
+.g-grid { display:grid; grid-template-columns:1fr 1fr; }
+.g-cell { padding:28px 32px 36px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); transition:background 0.15s; }
+.g-cell:hover { background:var(--surface); }
+.g-cell:nth-child(2n) { border-right:none; }
+.g-cell:nth-child(3), .g-cell:nth-child(4) { border-bottom:none; }
+
+.g-slabel { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.g-snum { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'DM Mono',monospace; font-size:11px; font-weight:700; flex-shrink:0; color:white; }
+.g-stitle { font-size:14px; font-weight:700; }
+.g-sdesc { font-size:11px; color:var(--muted); font-family:'DM Mono',monospace; margin-top:2px; }
+
+.g-device { background:#252525; border-radius:8px; padding:8px; box-shadow:0 16px 48px rgba(0,0,0,0.7),0 0 0 1px #3a3a3a; }
+
+/* The scaled eink screen container */
+.g-scaler {
+  position:relative;
+  width:100%;
+  overflow:hidden;
+  border:1px solid #3a3a3a;
+  background: var(--eink-bg);
+}
+
+/* The actual 800×480 screen — scaled by JS */
+.g-screen {
+  position:absolute;
+  top:0; left:0;
+  width:800px;
+  height:480px;
+  background: var(--eink-bg);
+  transform-origin: top left;
+  display:flex;
+  overflow:hidden;
+}
+
+.g-hwbtns { display:flex; justify-content:center; gap:10px; margin-top:7px; }
+.g-hwbtn { width:9px; height:9px; border-radius:50%; background:#3a3a3a; border:1px solid #4a4a4a; }
+
+.g-footer { padding:20px 40px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+.g-fmeta { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); display:flex; gap:20px; flex-wrap:wrap; }
+
+/* ── SHARED EINK VARIABLES ─────────────────────────────── */
+/* Each screen's scoped CSS uses these via var() references  */
+/* We redefine them inside each .sN scope                   */
+
+/* ── SCREEN 1 SCOPED CSS ── */
+.s1 {
+  --black:   #1a1a1a;
+  --white:   #f0ede8;
+  --red:     #c0392b;
+  --yellow:  #e6b800;
+  --blue:    #1a5fa8;
+  --green:   #2e7d32;
+  --grey:    #1a1a1a;
+  --divider: #1a1a1a;
+  --bg:      #f0ede8;
+}
+.s1 700&family=DM+Mono:wght@500&display=swap');
+
+  /* E-ink Spectra 6 palette only: black, .s1 white, .s1 red, .s1 yellow, .s1 blue, .s1 green */
+  
+
+  
+
+  
+
+  
+
+  
+
+  /* ── LEFT BAR ─────────────────────────────────── */
+  .left-bar {
+    width: 240px;
+    height: 480px;
+    border-right: 2px solid var(--black);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }.s1 /* WEATHER ZONE — fixed height 175px */
+  .weather-zone {
+    padding: 10px 12px 6px;
+    height: 175px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }.s1 .weather-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }.s1 .weather-temp {
+    font-size: 68px;
+    font-weight: bold;
+    color: var(--black);
+    line-height: 1;
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+  }.s1 .weather-icon {
+    font-size: 68px;
+    color: var(--yellow);
+  }.s1 .weather-sub {
+    font-size: 13px;
+    color: var(--black);
+    display: flex;
+    gap: 0;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    padding: 0 2px;
+  }.s1 .weather-sub-item {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+    justify-content: center;
+  }.s1 .weather-sub-item .mdi { font-size: 14px; }.s1 .weather-sub-item .mdi-thermometer-low { color: var(--blue); }.s1 .weather-sub-item .mdi-water-percent { color: var(--blue); }.s1 .weather-sub-item .mdi-weather-windy { color: var(--black); }.s1 .weather-sub-item .mdi-air-filter { color: var(--green); }.s1 .weather-sub-item span {
+    font-size: 13px;
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+  }.s1 .forecast-row {
+    display: flex;
+    gap: 4px;
+  }.s1 .forecast-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+  }.s1 .forecast-label {
+    font-size: 10px;
+    color: var(--black);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }.s1 .forecast-icon { font-size: 20px; }.s1 .forecast-temp { font-size: 12px; color: var(--black); font-weight: bold; }.s1 /* SOLAR ZONE — natural height, .s1 centred in remaining flex space */
+  .solar-spacer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }.s1 .solar-zone {
+    padding: 0 10px;
+    width: 100%;
+  }.s1 .solar-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 3px;
+    height: 140px;
+  }.s1 .solar-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    border: 1px solid #ccc;
+    padding: 3px;
+  }.s1 .solar-cell .mdi { font-size: 24px; }.s1 .solar-cell .val { font-size: 18px; font-weight: bold; color: var(--black); line-height: 1; }.s1 .solar-cell .sub { font-size: 9px; color: var(--grey); text-align: center; line-height: 1.2; }.s1 .cell-generation .mdi { color: var(--yellow); }.s1 .cell-load .mdi { color: var(--black); }.s1 .cell-export .mdi { color: var(--green); }.s1 .cell-import .mdi { color: var(--red); }.s1 /* BATTERY ZONE — fixed height, .s1 pinned to bottom */
+  .battery-zone {
+    padding: 8px 12px 12px;
+    height: 90px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 6px;
+  }.s1 .battery-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }.s1 .battery-left {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }.s1 .battery-icon { font-size: 28px; color: var(--green); }.s1 .battery-pct { font-size: 26px; font-weight: bold; color: var(--black); }.s1 .battery-eta {
+    font-size: 11px;
+    color: var(--black);
+    text-align: right;
+    line-height: 1.3;
+  }.s1 .battery-status {
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--green);
+    text-align: right;
+  }.s1 .battery-bar-wrap {
+    width: 100%;
+    height: 22px;
+    border: 2px solid var(--black);
+    padding: 2px;
+    background: var(--white);
+  }.s1 .battery-bar-fill {
+    height: 100%;
+    background: var(--green);
+    width: 87%;
+  }.s1 /* ── RIGHT PANEL ──────────────────────────────── */
+  .right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 480px;
+  }.s1 /* ICON BAR */
+  .icon-bar {
+    height: 44px;
+    border-bottom: 1px solid var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 16px;
+    flex-shrink: 0;
+  }.s1 .icon-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+    position: relative;
+  }.s1 .icon-slot .mdi { font-size: 26px; }.s1 .icon-slot.inactive .mdi { color: var(--grey); }.s1 .icon-slot.active-red    .mdi { color: var(--red); }.s1 .icon-slot.active-green  .mdi { color: var(--green); }.s1 .icon-slot.active-blue   .mdi { color: var(--blue); }.s1 .icon-slot.active-yellow .mdi { color: var(--yellow); }.s1 /* DETAIL AREA */
+  .detail-area {
+    flex: 1;
+    padding: 8px 14px 0 14px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }.s1 .detail-section-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black);
+    margin-bottom: 4px;
+    font-family: 'DM Mono', monospace;
+  }.s1 .alert-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    color: var(--black);
+    padding: 5px 8px;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    border-left: 5px solid var(--black);
+  }.s1 .alert-line .mdi { font-size: 17px; flex-shrink: 0; }.s1 .alert-line.alert-red { border-left-color: var(--red);    }.s1 .alert-line.alert-red    .mdi { color: var(--red);    }.s1 .alert-line.alert-green { border-left-color: var(--green);  }.s1 .alert-line.alert-green  .mdi { color: var(--green);  }.s1 .alert-line.alert-blue { border-left-color: var(--blue);   }.s1 .alert-line.alert-blue   .mdi { color: var(--blue);   }.s1 .alert-line.alert-yellow { border-left-color: var(--yellow); }.s1 .alert-line.alert-yellow .mdi { color: var(--yellow); }.s1 .all-clear {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    color: var(--green);
+    padding: 5px 8px;
+    border-left: 5px solid var(--green);
+    margin-bottom: 4px;
+  }.s1 .section-gap { height: 8px; }.s1 .calendar-section { display: flex; flex-direction: column; gap: 4px; }.s1 .calendar-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    color: var(--black);
+    padding: 5px 8px;
+    border-left: 5px solid var(--blue);
+  }.s1 .calendar-line .mdi { font-size: 15px; color: var(--blue); flex-shrink: 0; }.s1 .cal-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    min-width: 38px;
+    color: var(--black);
+  }.s1 /* STATUS FOOTER */
+  .status-footer {
+    position: absolute;
+    bottom: 6px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--grey);
+  }.s1 .status-footer .mdi { font-size: 12px; color: var(--grey); }
+
+  /* LABEL */
+  
+
+/* ── SCREEN 2 SCOPED CSS ── */
+.s2 {
+  --black:   #1a1a1a;
+  --white:   #f0ede8;
+  --red:     #c0392b;
+  --yellow:  #e6b800;
+  --blue:    #1a5fa8;
+  --green:   #2e7d32;
+  --grey:    #1a1a1a;
+  --divider: #1a1a1a;
+  --bg:      #f0ede8;
+}
+.s2 700&family=DM+Mono:wght@500&display=swap');
+
+
+
+
+
+
+
+
+
+
+
+/* ── LEFT BAR ── */
+.left-bar {
+  width: 240px;
+  height: 480px;
+  border-right: 2px solid var(--black);
+  display: flex;
+  flex-direction: column;
+  padding: 14px 14px;
+  gap: 0;
+  flex-shrink: 0;
+}.s2 .system-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}.s2 .system-title .mdi { font-size: 28px; color: var(--red); }.s2 .system-title-text { font-size: 16px; font-weight: 700; color: var(--black); }.s2 .system-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-left: 5px solid var(--black);
+  padding-left: 8px;
+  margin-bottom: 6px;
+}.s2 .system-row.heating { border-left-color: var(--red); }.s2 .system-row.cooling { border-left-color: var(--blue); }.s2 .system-row.ok { border-left-color: var(--green); }.s2 .system-row.idle { border-left-color: var(--black); }.s2 .system-row-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}.s2 .system-row-left .mdi { font-size: 18px; }.s2 .system-row.heating .mdi { color: var(--red); }.s2 .system-row.cooling .mdi { color: var(--blue); }.s2 .system-row.ok      .mdi { color: var(--green); }.s2 .system-row.idle    .mdi { color: var(--black); }.s2 .system-label { font-size: 12px; color: var(--black); font-weight: 700; }.s2 .system-value { font-size: 13px; color: var(--black); font-family: 'DM Mono', monospace; }.s2 .system-divider {
+  height: 1px;
+  background: var(--black);
+  margin: 4px 0 10px;
+  width: 100%;
+}.s2 .calling-summary {
+  margin-top: auto;
+  padding: 10px 8px;
+  border-left: 5px solid var(--red);
+}.s2 .calling-big {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--red);
+  line-height: 1;
+}.s2 .calling-sub {
+  font-size: 12px;
+  color: var(--black);
+  margin-top: 2px;
+}.s2 /* ── RIGHT PANEL ── */
+.right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 480px;
+  padding: 10px 14px 24px;
+  gap: 0;
+  position: relative;
+}.s2 .panel-title {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 8px;
+}.s2 /* ROOM ROW */
+.room-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  border-left: 5px solid var(--black);
+}.s2 .room-row.calling { border-left-color: transparent; }.s2 .room-row.at-target { border-left-color: transparent; }.s2 .room-row.over { border-left-color: transparent; }.s2 .room-row.idle { border-left-color: transparent; }.s2 .room-icon { font-size: 18px; color: var(--black); flex-shrink: 0; }.s2 .room-row.calling  .room-icon { color: var(--black); }.s2 .room-row.at-target .room-icon { color: var(--black); }.s2 .room-row.over     .room-icon { color: var(--black); }.s2 .room-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--black);
+  min-width: 100px;
+  flex-shrink: 0;
+}.s2 .room-temps {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-shrink: 0;
+  min-width: 90px;
+}.s2 .temp-actual {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--black);
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+  line-height: 1;
+}.s2 .temp-arrow {
+  font-size: 13px;
+  color: var(--black);
+}.s2 .temp-target {
+  font-size: 14px;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+  opacity: 0.6;
+}.s2 /* Delta bar — target always at centre, .s2 fill shows deviation
+   Scale: ±5° = full half bar
+   Fill grows LEFT from centre if cold (calling for heat)
+   Fill grows RIGHT from centre if hot (over target / cooling)
+   Centre line always visible as target marker               */
+.temp-bar-wrap {
+  flex: 1;
+  height: 12px;
+  background: var(--white);
+  border: 1px solid var(--black);
+  position: relative;
+  overflow: visible;
+  flex-shrink: 0;
+}.s2 .temp-bar-scale {
+  position: absolute;
+  bottom: -14px;
+  left: 0;
+  width: 100%;
+  font-size: 9px;
+  font-family: 'DM Mono', monospace;
+  color: var(--black);
+  pointer-events: none;
+}.s2 .temp-bar-scale span:nth-child(1) { position: absolute; left: 0; }.s2 .temp-bar-scale span:nth-child(2) { position: absolute; left: 50%; transform: translateX(-50%); }.s2 .temp-bar-scale span:nth-child(3) { position: absolute; right: 0; }.s2 /* Centre target line — always at 50% */
+.temp-bar-wrap::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  width: 3px;
+  height: calc(100% + 4px);
+  background: var(--black);
+  transform: translateX(-50%);
+  z-index: 2;
+}.s2 /* Fill anchored to centre */
+.temp-bar-fill {
+  position: absolute;
+  top: 0;
+  height: 100%;
+}.s2 /* Cold — fill grows leftward from centre */
+.room-row.calling .temp-bar-fill {
+  background: var(--red);
+  right: 50%;
+  left: auto;
+}.s2 /* Hot — fill grows rightward from centre */
+.room-row.over .temp-bar-fill {
+  background: var(--blue);
+  left: 50%;
+  right: auto;
+}.s2 /* At target — tiny symmetric fill either side */
+.room-row.at-target .temp-bar-fill {
+  background: var(--green);
+  left: 47%;
+  width: 6%;
+}.s2 /* Idle — no fill */
+.room-row.idle .temp-bar-fill {
+  display: none;
+}.s2 /* Status indicator */
+.room-status-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-left: 4px;
+}.s2 .room-row.calling   .room-status-icon { color: var(--red); }.s2 .room-row.at-target .room-status-icon { color: var(--green); }.s2 .room-row.over      .room-status-icon { color: var(--blue); }.s2 .room-row.idle      .room-status-icon { color: var(--black); }.s2 /* STATUS FOOTER */
+.status-footer {
+  position: absolute;
+  bottom: 6px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+}
+
+
+
+/* ── SCREEN 3 SCOPED CSS ── */
+.s3 {
+  --black:   #1a1a1a;
+  --white:   #f0ede8;
+  --red:     #c0392b;
+  --yellow:  #e6b800;
+  --blue:    #1a5fa8;
+  --green:   #2e7d32;
+  --grey:    #1a1a1a;
+  --divider: #1a1a1a;
+  --bg:      #f0ede8;
+}
+.s3 700&family=DM+Mono:wght@500&display=swap');
+
+  
+  
+  
+  
+  
+
+  /* ── LEFT BAR — ROOM TEMPS ── */
+  .left-bar {
+    width: 240px;
+    height: 480px;
+    border-right: 2px solid var(--black);
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    gap: 0px;
+    flex-shrink: 0;
+  }.s3 .floor-label {
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 4px;
+    margin-top: 6px;
+  }.s3 .floor-label:first-child { margin-top: 0; }.s3 .room-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+  }.s3 .room-row:last-of-type { border-bottom: none; }.s3 .room-icon { font-size: 20px; color: var(--black); flex-shrink: 0; }.s3 .room-icon.heating { color: var(--red); }.s3 .room-name {
+    flex: 1;
+    font-size: 14px;
+    color: var(--black);
+  }.s3 .room-readings {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+  }.s3 .room-temp {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--black);
+    line-height: 1;
+  }.s3 .room-humid {
+    font-size: 11px;
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }.s3 .room-humid .mdi { font-size: 10px; }.s3 .floor-divider {
+    width: 100%;
+    height: 1px;
+    background: var(--black);
+    margin: 6px 0;
+  }.s3 /* ── RIGHT PANEL ── */
+  .right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 480px;
+    padding: 12px 16px;
+    gap: 0;
+  }.s3 .section-header {
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 8px;
+  }.s3 /* PRESENCE */
+  .presence-section { margin-bottom: 14px; }.s3 .presence-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }.s3 .person-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }.s3 .person-icon { font-size: 32px; }.s3 .person-icon.home { color: var(--green); }.s3 .person-icon.away { color: var(--black); opacity: 0.25; }.s3 /* faded black = not home */
+
+  .person-name {
+    font-size: 11px;
+    color: var(--black);
+    text-align: center;
+  }.s3 /* MEDIA */
+  .media-section {
+    margin-bottom: 14px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+  }.s3 .media-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+  }.s3 .media-icon { font-size: 22px; color: var(--blue); flex-shrink: 0; }.s3 .media-detail { flex: 1; }.s3 .media-room { font-size: 11px; color: var(--grey); line-height: 1; }.s3 .media-title { font-size: 15px; color: var(--black); line-height: 1.3; font-weight: bold; }.s3 .media-artist { font-size: 12px; color: var(--black); line-height: 1.2; }.s3 /* TRANSPORT */
+  .transport-section {
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    flex: 1;
+  }.s3 .transport-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+  }.s3 .transport-row:last-child { border-bottom: none; }.s3 .transport-icon { font-size: 22px; flex-shrink: 0; }.s3 .transport-icon.bus { color: var(--green); }.s3 .transport-icon.train { color: var(--blue); }.s3 .transport-icon.tram { color: var(--yellow); }.s3 .transport-route {
+    flex: 1;
+  }.s3 .route-name { font-size: 15px; font-weight: bold; color: var(--black); }.s3 .route-dest { font-size: 11px; color: var(--grey); }.s3 .departure-times {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }.s3 .dep-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 44px;
+  }.s3 .dep-clock { font-size: 17px; font-weight: bold; color: var(--black); line-height: 1; }.s3 .dep-mins { font-size: 11px; color: var(--green); }.s3 .dep-mins.soon { color: var(--red); }.s3 /* STATUS FOOTER */
+  .status-footer {
+    position: absolute;
+    bottom: 6px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--grey);
+  }.s3 .right-panel { position: relative; }
+
+  
+
+/* ── SCREEN 4 SCOPED CSS ── */
+.s4 {
+  --black:   #1a1a1a;
+  --white:   #f0ede8;
+  --red:     #c0392b;
+  --yellow:  #e6b800;
+  --blue:    #1a5fa8;
+  --green:   #2e7d32;
+  --grey:    #1a1a1a;
+  --divider: #1a1a1a;
+  --bg:      #f0ede8;
+}
+.s4 700&family=DM+Mono:wght@500&display=swap');
+
+
+
+
+
+
+
+
+
+
+
+/* ── LEFT BAR ── */
+.left-bar {
+  width: 240px;
+  height: 480px;
+  border-right: 2px solid var(--black);
+  display: flex;
+  flex-direction: column;
+  padding: 14px 14px 10px;
+  flex-shrink: 0;
+}.s4 .alarm-icon-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}.s4 .alarm-icon-wrap .mdi {
+  font-size: 36px;
+}.s4 .alarm-state-text {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.1;
+}.s4 .alarm-since {
+  font-size: 12px;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 12px;
+}.s4 /* Armed = red, .s4 disarmed = green */
+.alarm-armed   .mdi, .s4 .alarm-armed   .alarm-state-text { color: var(--red); }.s4 .alarm-disarmed .mdi, .s4 .alarm-disarmed .alarm-state-text { color: var(--green); }.s4 .alarm-arming  .mdi, .s4 .alarm-arming  .alarm-state-text { color: var(--yellow); }.s4 .left-divider {
+  height: 1px;
+  background: var(--black);
+  margin: 8px 0;
+}.s4 /* Summary counts */
+.summary-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}.s4 .summary-row .mdi { font-size: 16px; color: var(--black); }.s4 .summary-row.has-alert .mdi { color: var(--red); }.s4 .summary-count {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--black);
+  min-width: 18px;
+}.s4 .summary-label {
+  font-size: 12px;
+  color: var(--black);
+}.s4 .summary-row.has-alert .summary-label { color: var(--red); font-weight: 700; }.s4 /* History */
+.history-block {
+  margin-top: auto;
+}.s4 .history-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 6px;
+}.s4 .history-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+  opacity: 0.5;
+}.s4 .history-value {
+  font-size: 13px;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+}.s4 /* ── RIGHT PANEL ── */
+.right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 480px;
+  padding: 8px 12px 20px;
+  overflow: hidden;
+  position: relative;
+}.s4 /* Section header */
+.section-header {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+  margin: 6px 0 3px;
+  opacity: 0.5;
+}.s4 .section-header:first-child { margin-top: 0; }.s4 /* Sensor row */
+.sensor-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  margin-bottom: 3px;
+  border-left: 5px solid var(--black);
+}.s4 .sensor-row.open { border-left-color: var(--red); }.s4 .sensor-row.closed { border-left-color: var(--green); }.s4 .sensor-row.motion { border-left-color: var(--blue); }.s4 .sensor-row.no-motion { border-left-color: var(--black); }.s4 .sensor-row.cam-motion { border-left-color: var(--blue); }.s4 .sensor-row.cam-clear { border-left-color: var(--black); }.s4 .sensor-icon { font-size: 15px; color: var(--black); flex-shrink: 0; }.s4 .sensor-row.open   .sensor-icon { color: var(--red); }.s4 .sensor-row.motion .sensor-icon, .s4 .sensor-row.cam-motion .sensor-icon { color: var(--blue); }.s4 .sensor-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--black);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}.s4 .sensor-state {
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  min-width: 52px;
+  text-align: right;
+}.s4 .sensor-row.open   .sensor-state { color: var(--red); }.s4 .sensor-row.closed .sensor-state { color: var(--green); }.s4 .sensor-time {
+  font-size: 11px;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+  flex-shrink: 0;
+  min-width: 44px;
+  text-align: right;
+  opacity: 0.6;
+}.s4 /* 2-column layout for right panel */
+.sensor-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 12px;
+  flex: 1;
+}.s4 .sensor-col { display: flex; flex-direction: column; }.s4 /* STATUS FOOTER */
+.status-footer {
+  position: absolute;
+  bottom: 5px;
+  right: 10px;
+  font-size: 11px;
+  color: var(--black);
+  font-family: 'DM Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+
+
+</style>
+</head>
+<body>
+<div class="g-header">
+  <div>
+    <div class="g-tag">reTerminal E1002 · ESPHome · E Ink Spectra 6</div>
+    <div class="g-title">Kitchen Panel</div>
+  </div>
+  <div class="g-pills">
+    <div class="g-pill"><span class="mdi mdi-monitor"></span>800 × 480</div>
+    <div class="g-pill"><span class="mdi mdi-palette"></span>6 colours</div>
+    <div class="g-pill"><span class="mdi mdi-battery-charging-80"></span>Battery</div>
+    <div class="g-pill"><span class="mdi mdi-chip"></span>ESP32-S3</div>
+    <div class="g-pill"><span class="mdi mdi-home-assistant"></span>Home Assistant</div>
+  </div>
+</div>
+
+<div class="g-palette">
+  <span class="g-plabel">Spectra 6</span>
+  <div class="g-pdot" style="background:#1a1a1a;border:1px solid #444"></div><span class="g-pname">Black</span>
+  <div class="g-pdot" style="background:#f0ede8;border:1px solid #555"></div><span class="g-pname">White</span>
+  <div class="g-pdot" style="background:#c0392b"></div><span class="g-pname">Red</span>
+  <div class="g-pdot" style="background:#e6b800"></div><span class="g-pname">Yellow</span>
+  <div class="g-pdot" style="background:#2e7d32"></div><span class="g-pname">Green</span>
+  <div class="g-pdot" style="background:#1a5fa8"></div><span class="g-pname">Blue</span>
+</div>
+
+<div class="g-btns">
+  <div class="g-btn-item"><span class="g-chip">◀ Left</span>Previous screen</div>
+  <div class="g-btn-item"><span class="g-chip">● Short press</span>Force refresh</div>
+  <div class="g-btn-item"><span class="g-chip">● Long press</span>Config mode</div>
+  <div class="g-btn-item"><span class="g-chip">▶ Right</span>Next screen</div>
+  <div class="g-btn-item" style="margin-left:auto">
+    <span class="mdi mdi-clock-outline" style="font-size:14px"></span>&nbsp;Refresh every 30 min · Deep sleep 28m30s
+  </div>
+</div>
+
+<div class="g-grid">
+  <div class="g-cell">
+    <div class="g-slabel">
+      <div class="g-snum" style="background:#2e7d32;">1</div>
+      <div>
+        <div class="g-stitle">Main Dashboard</div>
+        <div class="g-sdesc">Weather · Solar · Battery · Status alerts · Calendar</div>
+      </div>
+    </div>
+    <div class="g-device">
+      <div class="g-scaler" id="scaler-1">
+        <div class="g-screen s1" id="screen-1">
+<!-- ═══ LEFT BAR ═══ -->
+      <div class="left-bar">
+
+        <!-- WEATHER -->
+        <div class="weather-zone">
+          <div class="weather-main">
+            <span class="weather-temp">18°</span>
+            <span class="mdi mdi-weather-partly-cloudy weather-icon"></span>
+          </div>
+          <div class="weather-sub">
+            <div class="weather-sub-item">
+              <span class="mdi mdi-thermometer-low"></span>
+              <span>16°</span>
+            </div>
+            <div class="weather-sub-item">
+              <span class="mdi mdi-water-percent"></span>
+              <span>65%</span>
+            </div>
+            <div class="weather-sub-item">
+              <span class="mdi mdi-weather-windy"></span>
+              <span>12</span>
+            </div>
+            <div class="weather-sub-item">
+              <span class="mdi mdi-air-filter" style="color:var(--green)"></span>
+              <span>24</span>
+            </div>
+          </div>
+          <div class="forecast-row">
+            <div class="forecast-col">
+              <span class="forecast-label">Later</span>
+              <span class="mdi mdi-weather-cloudy forecast-icon" style="color:var(--grey)"></span>
+              <span class="forecast-temp">14°</span>
+            </div>
+            <div class="forecast-col">
+              <span class="forecast-label">Thu</span>
+              <span class="mdi mdi-weather-rainy forecast-icon" style="color:var(--blue)"></span>
+              <span class="forecast-temp">15°</span>
+            </div>
+            <div class="forecast-col">
+              <span class="forecast-label">Fri</span>
+              <span class="mdi mdi-weather-sunny forecast-icon" style="color:var(--yellow)"></span>
+              <span class="forecast-temp">20°</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOLAR 2×2 — centred in remaining space -->
+        <div class="solar-spacer">
+          <div class="solar-zone">
+            <div class="solar-grid">
+              <div class="solar-cell cell-generation">
+                <span class="mdi mdi-solar-power-variant"></span>
+                <span class="val">47.2</span>
+                <span class="sub">of 52 kWh exp.</span>
+              </div>
+              <div class="solar-cell cell-load">
+                <span class="mdi mdi-home-lightning-bolt"></span>
+                <span class="val">8.3</span>
+                <span class="sub">kWh load</span>
+              </div>
+              <div class="solar-cell cell-export">
+                <span class="mdi mdi-transmission-tower-export"></span>
+                <span class="val">2.1</span>
+                <span class="sub">kWh export</span>
+              </div>
+              <div class="solar-cell cell-import">
+                <span class="mdi mdi-transmission-tower-import"></span>
+                <span class="val">1.4</span>
+                <span class="sub">kWh import</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BATTERY -->
+        <div class="battery-zone">
+          <div class="battery-header">
+            <div class="battery-left">
+              <span class="mdi mdi-battery-80 battery-icon"></span>
+              <span class="battery-pct">87%</span>
+            </div>
+            <div>
+              <div class="battery-status">Charging</div>
+              <div class="battery-eta">Full at 14:30</div>
+            </div>
+          </div>
+          <div class="battery-bar-wrap">
+            <div class="battery-bar-fill"></div>
+          </div>
+        </div>
+
+      </div><!-- /left-bar -->
+
+      <!-- ═══ RIGHT PANEL ═══ -->
+      <div class="right-panel">
+
+        <!-- ICON BAR -->
+        <div class="icon-bar">
+          <!-- Alarm: green = disarmed -->
+          <div class="icon-slot active-green" title="Alarm: Disarmed">
+            <span class="mdi mdi-shield-home"></span>
+          </div>
+          <!-- Doors: red = open -->
+          <div class="icon-slot active-red" title="Door: Open">
+            <span class="mdi mdi-door-open"></span>
+          </div>
+          <!-- Windows: grey = all closed -->
+          <div class="icon-slot inactive" title="Windows: All closed">
+            <span class="mdi mdi-window-closed"></span>
+          </div>
+          <!-- Plants: red = due -->
+          <div class="icon-slot active-red" title="Plants: Due watering">
+            <span class="mdi mdi-flower"></span>
+          </div>
+          <!-- Heating: grey = idle -->
+          <div class="icon-slot inactive" title="Heating: Idle">
+            <span class="mdi mdi-radiator"></span>
+          </div>
+          <!-- Hot water: red = active -->
+          <div class="icon-slot active-red" title="Hot water: Heating">
+            <span class="mdi mdi-water-boiler"></span>
+          </div>
+          <!-- Vacuum 1: green = running -->
+          <div class="icon-slot active-green" title="Vacuum 1: Running">
+            <span class="mdi mdi-robot-vacuum"></span>
+          </div>
+          <!-- Vacuum 2: blue = scheduled -->
+          <div class="icon-slot active-blue" title="Vacuum 2: Scheduled today">
+            <span class="mdi mdi-robot-vacuum-variant"></span>
+          </div>
+          <!-- Mower: grey = inactive -->
+          <div class="icon-slot inactive" title="Mower: Inactive">
+            <span class="mdi mdi-robot-mower"></span>
+          </div>
+        </div>
+
+        <!-- DETAIL AREA -->
+        <div class="detail-area">
+
+          <!-- Active alerts -->
+          <div class="detail-section-label">Status</div>
+          <div class="alert-line alert-red">
+            <span class="mdi mdi-door-open"></span>
+            <span>Front door open</span>
+          </div>
+          <div class="alert-line alert-red">
+            <span class="mdi mdi-flower"></span>
+            <span>Pothos due watering</span>
+          </div>
+          <div class="alert-line alert-red">
+            <span class="mdi mdi-water-boiler"></span>
+            <span>Hot water heating</span>
+          </div>
+          <div class="alert-line alert-green">
+            <span class="mdi mdi-robot-vacuum"></span>
+            <span>Vacuum 1 running — Kitchen</span>
+          </div>
+
+          <!-- Thin separator -->
+          <div class="section-gap"></div>
+
+          <!-- Calendar events -->
+          <div class="detail-section-label">Today</div>
+          <div class="calendar-section">
+            <div class="calendar-line">
+              <span class="mdi mdi-robot-vacuum-variant"></span>
+              <span class="cal-time">14:00</span>
+              <span>Vacuum 2 scheduled</span>
+            </div>
+            <div class="calendar-line">
+              <span class="mdi mdi-delete-empty"></span>
+              <span class="cal-time">—</span>
+              <span>Bin collection today</span>
+            </div>
+            <div class="calendar-line">
+              <span class="mdi mdi-calendar"></span>
+              <span class="cal-time">17:30</span>
+              <span>School pickup</span>
+            </div>
+          </div>
+
+          <!-- Smart footer: time + battery (colored) + temp warning -->
+          <div class="status-footer">
+            <!-- Temp warning — only shown when out of range -->
+            <span class="mdi mdi-thermometer" style="color:var(--red);font-size:13px"></span>
+            <span style="color:var(--red);font-size:11px;font-family:'DM Mono',monospace">8°</span>
+            <span style="margin:0 3px;font-size:11px;color:var(--black)">·</span>
+            <!-- Battery — red when critical -->
+            <span class="mdi mdi-battery-alert" style="color:var(--red);font-size:13px"></span>
+            <span style="color:var(--red);font-size:11px;font-family:'DM Mono',monospace">8%</span>
+            <span style="margin:0 3px;font-size:11px;color:var(--black)">·</span>
+            <!-- Normal state examples -->
+            <span class="mdi mdi-clock-outline" style="font-size:12px"></span>
+            <span style="font-size:11px;font-family:'DM Mono',monospace">updated 14:32</span>
+            <span style="margin:0 3px;font-size:11px;color:var(--black)">·</span>
+            <span class="mdi mdi-battery-80" style="color:var(--green);font-size:13px"></span>
+            <span style="color:var(--green);font-size:11px;font-family:'DM Mono',monospace">87%</span>
+          </div>
+          <!-- Note: above shows ALL states for mockup. On device only active warnings show. -->
+
+        </div><!-- /detail-area -->
+
+      </div><!-- /right-panel -->
+        </div>
+      </div>
+      <div class="g-hwbtns">
+        <div class="g-hwbtn"></div>
+        <div class="g-hwbtn" style="background:#2e7d32;border-color:#2e7d32"></div>
+        <div class="g-hwbtn"></div>
+      </div>
+    </div>
+  </div>
+  <div class="g-cell">
+    <div class="g-slabel">
+      <div class="g-snum" style="background:#c0392b;">2</div>
+      <div>
+        <div class="g-stitle">Climate</div>
+        <div class="g-sdesc">Heat pump · Room temps · Calling status · Delta bars</div>
+      </div>
+    </div>
+    <div class="g-device">
+      <div class="g-scaler" id="scaler-2">
+        <div class="g-screen s2" id="screen-2">
+<!-- ═══ LEFT BAR ═══ -->
+      <div class="left-bar">
+
+        <div class="system-title">
+          <span class="mdi mdi-heat-pump"></span>
+          <span class="system-title-text">Heat Pump</span>
+        </div>
+
+        <!-- Mode -->
+        <div class="system-row heating">
+          <div class="system-row-left">
+            <span class="mdi mdi-fire"></span>
+            <span class="system-label">Mode</span>
+          </div>
+          <span class="system-value">Heating</span>
+        </div>
+
+        <!-- Outside temp -->
+        <div class="system-row idle">
+          <div class="system-row-left">
+            <span class="mdi mdi-thermometer"></span>
+            <span class="system-label">Outside</span>
+          </div>
+          <span class="system-value">8.4°</span>
+        </div>
+
+        <!-- Setpoint -->
+        <div class="system-row ok">
+          <div class="system-row-left">
+            <span class="mdi mdi-thermostat"></span>
+            <span class="system-label">Setpoint</span>
+          </div>
+          <span class="system-value">21°</span>
+        </div>
+
+        <!-- COP / efficiency -->
+        <div class="system-row ok">
+          <div class="system-row-left">
+            <span class="mdi mdi-lightning-bolt"></span>
+            <span class="system-label">COP</span>
+          </div>
+          <span class="system-value">3.2</span>
+        </div>
+
+        <!-- Cooling idle -->
+        <div class="system-row idle">
+          <div class="system-row-left">
+            <span class="mdi mdi-snowflake"></span>
+            <span class="system-label">Cooling</span>
+          </div>
+          <span class="system-value">Idle</span>
+        </div>
+
+        <!-- Calling summary -->
+        <div class="calling-summary">
+          <div class="calling-big">4</div>
+          <div class="calling-sub">of 6 rooms calling</div>
+        </div>
+
+      </div><!-- /left-bar -->
+
+      <!-- ═══ RIGHT PANEL ═══ -->
+      <div class="right-panel">
+
+        <div class="panel-title">Room Climate</div>
+
+        <!-- Living Room — delta -1.8° → 18% left of centre -->
+        <div class="room-row calling">
+          <span class="mdi mdi-sofa room-icon"></span>
+          <span class="room-name">Living Room</span>
+          <div class="room-temps">
+            <span class="temp-actual">19.2°</span>
+            <span class="temp-arrow">→</span>
+            <span class="temp-target">21°</span>
+          </div>
+          <div class="temp-bar-wrap">
+            <div class="temp-bar-fill" style="width:18%"></div>
+            <div class="temp-bar-scale"><span>-5°</span><span>0</span><span>+5°</span></div>
+          </div>
+          <span class="mdi mdi-fire room-status-icon"></span>
+        </div>
+
+        <!-- Kitchen — delta -0.9° → 9% left -->
+        <div class="room-row calling">
+          <span class="mdi mdi-chef-hat room-icon"></span>
+          <span class="room-name">Kitchen</span>
+          <div class="room-temps">
+            <span class="temp-actual">20.1°</span>
+            <span class="temp-arrow">→</span>
+            <span class="temp-target">21°</span>
+          </div>
+          <div class="temp-bar-wrap">
+            <div class="temp-bar-fill" style="width:9%"></div>
+          </div>
+          <span class="mdi mdi-fire room-status-icon"></span>
+        </div>
+
+        <!-- Main Bed — delta +0.3° → at target -->
+        <div class="room-row at-target">
+          <span class="mdi mdi-bed room-icon"></span>
+          <span class="room-name">Main Bed</span>
+          <div class="room-temps">
+            <span class="temp-actual">21.3°</span>
+            <span class="temp-arrow">→</span>
+            <span class="temp-target">21°</span>
+          </div>
+          <div class="temp-bar-wrap">
+            <div class="temp-bar-fill" style="width:3%"></div>
+          </div>
+          <span class="mdi mdi-check-circle room-status-icon"></span>
+        </div>
+
+        <!-- Guest — delta -1.2° → 12% left -->
+        <div class="room-row calling">
+          <span class="mdi mdi-bed room-icon"></span>
+          <span class="room-name">Guest</span>
+          <div class="room-temps">
+            <span class="temp-actual">18.8°</span>
+            <span class="temp-arrow">→</span>
+            <span class="temp-target">20°</span>
+          </div>
+          <div class="temp-bar-wrap">
+            <div class="temp-bar-fill" style="width:12%"></div>
+          </div>
+          <span class="mdi mdi-fire room-status-icon"></span>
+        </div>
+
+        <!-- Bathroom — delta +2.1° → 21% right -->
+        <div class="room-row over">
+          <span class="mdi mdi-shower room-icon"></span>
+          <span class="room-name">Bathroom</span>
+          <div class="room-temps">
+            <span class="temp-actual">23.1°</span>
+            <span class="temp-arrow">→</span>
+            <span class="temp-target">21°</span>
+          </div>
+          <div class="temp-bar-wrap">
+            <div class="temp-bar-fill" style="width:21%"></div>
+          </div>
+          <span class="mdi mdi-snowflake room-status-icon"></span>
+        </div>
+
+        <!-- Office — delta -1.5° → 15% left -->
+        <div class="room-row calling">
+          <span class="mdi mdi-desk room-icon"></span>
+          <span class="room-name">Office</span>
+          <div class="room-temps">
+            <span class="temp-actual">19.5°</span>
+            <span class="temp-arrow">→</span>
+            <span class="temp-target">21°</span>
+          </div>
+          <div class="temp-bar-wrap">
+            <div class="temp-bar-fill" style="width:15%"></div>
+          </div>
+          <span class="mdi mdi-fire room-status-icon"></span>
+        </div>
+
+        <!-- Footer -->
+        <div class="status-footer">
+          <span class="mdi mdi-clock-outline"></span>
+          <span>updated 14:32</span>
+          <span>·</span>
+          <span class="mdi mdi-battery-80"></span>
+          <span>87%</span>
+        </div>
+
+      </div><!-- /right-panel -->
+        </div>
+      </div>
+      <div class="g-hwbtns">
+        <div class="g-hwbtn"></div>
+        <div class="g-hwbtn" style="background:#c0392b;border-color:#c0392b"></div>
+        <div class="g-hwbtn"></div>
+      </div>
+    </div>
+  </div>
+  <div class="g-cell">
+    <div class="g-slabel">
+      <div class="g-snum" style="background:#1a5fa8;">3</div>
+      <div>
+        <div class="g-stitle">Presence & Transport</div>
+        <div class="g-sdesc">Motion sensors · Media · Public transport departures</div>
+      </div>
+    </div>
+    <div class="g-device">
+      <div class="g-scaler" id="scaler-3">
+        <div class="g-screen s3" id="screen-3">
+<!-- ═══ LEFT BAR — ROOM TEMPS ═══ -->
+      <div class="left-bar">
+
+        <div class="floor-label">Upstairs</div>
+
+        <div class="room-row">
+          <span class="mdi mdi-bed room-icon"></span>
+          <span class="room-name">Main Bed</span>
+          <div class="room-readings">
+            <span class="room-temp">21°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>58%</span>
+          </div>
+        </div>
+
+        <div class="room-row">
+          <span class="mdi mdi-bed room-icon"></span>
+          <span class="room-name">Guest</span>
+          <div class="room-readings">
+            <span class="room-temp">19°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>52%</span>
+          </div>
+        </div>
+
+        <div class="room-row">
+          <span class="mdi mdi-shower room-icon"></span>
+          <span class="room-name">Bathroom</span>
+          <div class="room-readings">
+            <span class="room-temp">22°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>71%</span>
+          </div>
+        </div>
+
+        <div class="room-row">
+          <span class="mdi mdi-desk room-icon"></span>
+          <span class="room-name">Office</span>
+          <div class="room-readings">
+            <span class="room-temp">20°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>55%</span>
+          </div>
+        </div>
+
+        <div class="floor-divider"></div>
+        <div class="floor-label">Downstairs</div>
+
+        <div class="room-row">
+          <span class="mdi mdi-sofa room-icon heating"></span>
+          <span class="room-name">Living</span>
+          <div class="room-readings">
+            <span class="room-temp">20°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>55%</span>
+          </div>
+        </div>
+
+        <div class="room-row">
+          <span class="mdi mdi-chef-hat room-icon"></span>
+          <span class="room-name">Kitchen</span>
+          <div class="room-readings">
+            <span class="room-temp">19°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>60%</span>
+          </div>
+        </div>
+
+        <div class="room-row">
+          <span class="mdi mdi-door room-icon"></span>
+          <span class="room-name">Hall</span>
+          <div class="room-readings">
+            <span class="room-temp">17°</span>
+            <span class="room-humid"><span class="mdi mdi-water-percent"></span>50%</span>
+          </div>
+        </div>
+
+      </div><!-- /left-bar -->
+
+      <!-- ═══ RIGHT PANEL ═══ -->
+      <div class="right-panel">
+
+        <!-- PRESENCE -->
+        <div class="presence-section">
+          <div class="section-header">Presence</div>
+          <div class="presence-row">
+            <div class="person-slot">
+              <span class="mdi mdi-account-circle person-icon home"></span>
+              <span class="person-name">Alex</span>
+            </div>
+            <div class="person-slot">
+              <span class="mdi mdi-account-circle person-icon home"></span>
+              <span class="person-name">Sam</span>
+            </div>
+            <div class="person-slot">
+              <span class="mdi mdi-account-circle person-icon away"></span>
+              <span class="person-name">Jamie</span>
+            </div>
+            <div class="person-slot">
+              <span class="mdi mdi-account-circle person-icon away"></span>
+              <span class="person-name">Riley</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MEDIA -->
+        <div class="media-section">
+          <div class="section-header">Now Playing</div>
+
+          <div class="media-row">
+            <span class="mdi mdi-music media-icon"></span>
+            <div class="media-detail">
+              <div class="media-room">Bedroom · Spotify</div>
+              <div class="media-title">Comptine d'un autre été</div>
+              <div class="media-artist">Yann Tiersen</div>
+            </div>
+          </div>
+
+          <div class="media-row">
+            <span class="mdi mdi-television-play media-icon"></span>
+            <div class="media-detail">
+              <div class="media-room">Living Room · Netflix</div>
+              <div class="media-title">The Bear — S03E04</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TRANSPORT -->
+        <div class="transport-section">
+          <div class="section-header">Next Departures</div>
+
+          <div class="transport-row">
+            <span class="mdi mdi-bus transport-icon bus"></span>
+            <div class="transport-route">
+              <div class="route-name">42 · City Centre</div>
+              <div class="route-dest">High Street stop</div>
+            </div>
+            <div class="departure-times">
+              <div class="dep-time">
+                <span class="dep-clock">12:34</span>
+                <span class="dep-mins soon">3 min</span>
+              </div>
+              <div class="dep-time">
+                <span class="dep-clock">12:51</span>
+                <span class="dep-mins">20 min</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="transport-row">
+            <span class="mdi mdi-train transport-icon train"></span>
+            <div class="transport-route">
+              <div class="route-name">Overground · Waterloo</div>
+              <div class="route-dest">Central Station</div>
+            </div>
+            <div class="departure-times">
+              <div class="dep-time">
+                <span class="dep-clock">12:40</span>
+                <span class="dep-mins">9 min</span>
+              </div>
+              <div class="dep-time">
+                <span class="dep-clock">13:10</span>
+                <span class="dep-mins">39 min</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="transport-row">
+            <span class="mdi mdi-bus transport-icon bus"></span>
+            <div class="transport-route">
+              <div class="route-name">7 · Airport</div>
+              <div class="route-dest">High Street stop</div>
+            </div>
+            <div class="departure-times">
+              <div class="dep-time">
+                <span class="dep-clock">13:02</span>
+                <span class="dep-mins">31 min</span>
+              </div>
+              <div class="dep-time">
+                <span class="dep-clock">13:18</span>
+                <span class="dep-mins">47 min</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- STATUS FOOTER -->
+        <div class="status-footer">
+          <span class="mdi mdi-clock-outline"></span>
+          <span>updated 14:32</span>
+          <span style="margin:0 2px">·</span>
+          <span class="mdi mdi-battery-80"></span>
+          <span>87%</span>
+        </div>
+
+      </div><!-- /right-panel -->
+        </div>
+      </div>
+      <div class="g-hwbtns">
+        <div class="g-hwbtn"></div>
+        <div class="g-hwbtn" style="background:#1a5fa8;border-color:#1a5fa8"></div>
+        <div class="g-hwbtn"></div>
+      </div>
+    </div>
+  </div>
+  <div class="g-cell">
+    <div class="g-slabel">
+      <div class="g-snum" style="background:#1a1a1a;border:1px solid #555;">4</div>
+      <div>
+        <div class="g-stitle">Security</div>
+        <div class="g-sdesc">Alarm · Doors & windows · Motion history · Cameras</div>
+      </div>
+    </div>
+    <div class="g-device">
+      <div class="g-scaler" id="scaler-4">
+        <div class="g-screen s4" id="screen-4">
+<!-- ═══ LEFT BAR ═══ -->
+      <div class="left-bar">
+
+        <!-- Alarm state -->
+        <div class="alarm-armed">
+          <div class="alarm-icon-wrap">
+            <span class="mdi mdi-shield-lock"></span>
+            <span class="alarm-state-text">Armed Away</span>
+          </div>
+        </div>
+        <div class="alarm-since">since 08:47</div>
+
+        <div class="left-divider"></div>
+
+        <!-- Summary counts -->
+        <div class="summary-row">
+          <span class="mdi mdi-door"></span>
+          <span class="summary-count">4</span>
+          <span class="summary-label">doors — all closed</span>
+        </div>
+        <div class="summary-row has-alert">
+          <span class="mdi mdi-window-open"></span>
+          <span class="summary-count">1</span>
+          <span class="summary-label">window open</span>
+        </div>
+        <div class="summary-row">
+          <span class="mdi mdi-motion-sensor"></span>
+          <span class="summary-count">6</span>
+          <span class="summary-label">motion sensors</span>
+        </div>
+        <div class="summary-row">
+          <span class="mdi mdi-cctv"></span>
+          <span class="summary-count">3</span>
+          <span class="summary-label">cameras</span>
+        </div>
+
+        <div class="left-divider"></div>
+
+        <!-- Alarm history -->
+        <div class="history-block">
+          <div class="history-row">
+            <span class="history-label">Last Armed</span>
+            <span class="history-value">08:47 today</span>
+          </div>
+          <div class="history-row">
+            <span class="history-label">Last Disarmed</span>
+            <span class="history-value">07:12 today</span>
+          </div>
+          <div class="history-row">
+            <span class="history-label">Last Triggered</span>
+            <span class="history-value">3 days ago</span>
+          </div>
+        </div>
+
+      </div><!-- /left-bar -->
+
+      <!-- ═══ RIGHT PANEL ═══ -->
+      <div class="right-panel">
+
+        <div class="sensor-columns">
+
+          <!-- LEFT COLUMN -->
+          <div class="sensor-col">
+
+            <div class="section-header">Doors</div>
+
+            <div class="sensor-row closed">
+              <span class="mdi mdi-door sensor-icon"></span>
+              <span class="sensor-name">Front door</span>
+              <span class="sensor-state">Closed</span>
+              <span class="sensor-time">08:47</span>
+            </div>
+            <div class="sensor-row closed">
+              <span class="mdi mdi-door sensor-icon"></span>
+              <span class="sensor-name">Back door</span>
+              <span class="sensor-state">Closed</span>
+              <span class="sensor-time">07:30</span>
+            </div>
+            <div class="sensor-row closed">
+              <span class="mdi mdi-door sensor-icon"></span>
+              <span class="sensor-name">Garage</span>
+              <span class="sensor-state">Closed</span>
+              <span class="sensor-time">08:20</span>
+            </div>
+            <div class="sensor-row closed">
+              <span class="mdi mdi-door sensor-icon"></span>
+              <span class="sensor-name">Side gate</span>
+              <span class="sensor-state">Closed</span>
+              <span class="sensor-time">yesterday</span>
+            </div>
+
+            <div class="section-header" style="margin-top:8px">Windows</div>
+
+            <div class="sensor-row open">
+              <span class="mdi mdi-window-open sensor-icon"></span>
+              <span class="sensor-name">Kitchen</span>
+              <span class="sensor-state">Open</span>
+              <span class="sensor-time">14:21</span>
+            </div>
+            <div class="sensor-row closed">
+              <span class="mdi mdi-window-closed sensor-icon"></span>
+              <span class="sensor-name">Living room</span>
+              <span class="sensor-state">Closed</span>
+              <span class="sensor-time">08:47</span>
+            </div>
+            <div class="sensor-row closed">
+              <span class="mdi mdi-window-closed sensor-icon"></span>
+              <span class="sensor-name">Main bed</span>
+              <span class="sensor-state">Closed</span>
+              <span class="sensor-time">08:47</span>
+            </div>
+
+          </div><!-- /left col -->
+
+          <!-- RIGHT COLUMN -->
+          <div class="sensor-col">
+
+            <div class="section-header">Motion</div>
+
+            <div class="sensor-row motion">
+              <span class="mdi mdi-motion-sensor sensor-icon"></span>
+              <span class="sensor-name">Living room</span>
+              <span class="sensor-time" style="min-width:unset">14:32</span>
+            </div>
+            <div class="sensor-row motion">
+              <span class="mdi mdi-motion-sensor sensor-icon"></span>
+              <span class="sensor-name">Kitchen</span>
+              <span class="sensor-time" style="min-width:unset">14:28</span>
+            </div>
+            <div class="sensor-row no-motion">
+              <span class="mdi mdi-motion-sensor sensor-icon"></span>
+              <span class="sensor-name">Hall</span>
+              <span class="sensor-time" style="min-width:unset">09:14</span>
+            </div>
+            <div class="sensor-row no-motion">
+              <span class="mdi mdi-motion-sensor sensor-icon"></span>
+              <span class="sensor-name">Main bed</span>
+              <span class="sensor-time" style="min-width:unset">08:02</span>
+            </div>
+            <div class="sensor-row no-motion">
+              <span class="mdi mdi-motion-sensor sensor-icon"></span>
+              <span class="sensor-name">Office</span>
+              <span class="sensor-time" style="min-width:unset">07:45</span>
+            </div>
+            <div class="sensor-row no-motion">
+              <span class="mdi mdi-motion-sensor sensor-icon"></span>
+              <span class="sensor-name">Garden</span>
+              <span class="sensor-time" style="min-width:unset">06:30</span>
+            </div>
+
+            <div class="section-header" style="margin-top:8px">Cameras</div>
+
+            <div class="sensor-row cam-motion">
+              <span class="mdi mdi-cctv sensor-icon"></span>
+              <span class="sensor-name">Front</span>
+              <span class="sensor-time" style="min-width:unset">13:45</span>
+            </div>
+            <div class="sensor-row cam-motion">
+              <span class="mdi mdi-cctv sensor-icon"></span>
+              <span class="sensor-name">Driveway</span>
+              <span class="sensor-time" style="min-width:unset">11:02</span>
+            </div>
+            <div class="sensor-row cam-clear">
+              <span class="mdi mdi-cctv sensor-icon"></span>
+              <span class="sensor-name">Garden</span>
+              <span class="sensor-time" style="min-width:unset">—</span>
+            </div>
+
+          </div><!-- /right col -->
+
+        </div><!-- /sensor-columns -->
+
+        <!-- Footer -->
+        <div class="status-footer">
+          <span class="mdi mdi-clock-outline"></span>
+          <span>updated 14:32</span>
+          <span>·</span>
+          <span class="mdi mdi-battery-80"></span>
+          <span>87%</span>
+        </div>
+
+      </div><!-- /right-panel -->
+        </div>
+      </div>
+      <div class="g-hwbtns">
+        <div class="g-hwbtn"></div>
+        <div class="g-hwbtn" style="background:#1a1a1a;border-color:#1a1a1a"></div>
+        <div class="g-hwbtn"></div>
+      </div>
+    </div>
+  </div>
+</div><!-- /g-grid -->
+
+<div class="g-footer">
+  <div class="g-fmeta">
+    <span><span class="mdi mdi-format-font" style="font-size:13px"></span> Atkinson Hyperlegible · DM Mono · MDI 7.2</span>
+    <span><span class="mdi mdi-cog" style="font-size:13px"></span> ESP-IDF · PSRAM Octal 80MHz</span>
+    <span><span class="mdi mdi-battery" style="font-size:13px"></span> 2000mAh · Est. 3 month battery</span>
+  </div>
+  <div style="font-family:'DM Mono',monospace;font-size:11px;color:#333">
+    All screens 800×480 · Spectra 6 palette only · No greyscale
+  </div>
+</div>
+
+<script>
+function scaleScreens() {
+  for (let i = 1; i <= 4; i++) {
+    const scaler = document.getElementById('scaler-' + i);
+    const screen = document.getElementById('screen-' + i);
+    if (!scaler || !screen) continue;
+    const scale = scaler.offsetWidth / 800;
+    screen.style.transform = 'scale(' + scale + ')';
+    scaler.style.height = Math.round(480 * scale) + 'px';
+  }
+}
+window.addEventListener('resize', scaleScreens);
+window.addEventListener('load',   scaleScreens);
+</script>
+</body>
+</html>

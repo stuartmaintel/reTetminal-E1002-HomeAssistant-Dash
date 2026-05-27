@@ -1,0 +1,1702 @@
+# ============================================================
+#  kitchen-panel.yaml
+#  reTerminal E1002 — Kitchen Dashboard
+#  ESPHome · ESP-IDF · 3-screen ePaper panel
+#
+#  Screen 1: Main dashboard (weather, solar, battery, status)
+#  Screen 2: Climate (room temps, heat pump, calling status)
+#  Screen 3: Secondary (presence, motion, media, transport)
+#
+#  Buttons:  Left=prev screen  Right=next screen  Mid=config
+#  Deep sleep: 30 min between refreshes (disabled in config mode)
+# ============================================================
+
+esphome:
+  name: kitchen-panel
+  friendly_name: Kitchen Panel
+  includes:
+    - config_server.h
+  libraries:
+    - ArduinoJson
+  on_boot:
+    priority: 600
+    then:
+      # Enable battery measurement circuit (GPIO21 must be HIGH first)
+      - output.turn_on: bsp_battery_enable
+      # Enable SD card power rail
+      - output.turn_on: bsp_sd_enable
+      - delay: 300ms
+      # Load all config from NVS into globals
+      - lambda: 'load_config_from_nvs();'
+      # Initial sensor readings
+      - component.update: battery_voltage
+      - component.update: battery_level
+      - component.update: internal_temp_sensor
+      # Brief LED flash to confirm boot (matches Seeed wiki pattern)
+      - light.turn_on: onboard_led
+      - delay: 200ms
+      - light.turn_off: onboard_led
+      # Register config API on web server
+      - lambda: |-
+          extern httpd_handle_t httpd_handle;
+          register_config_api(httpd_handle);
+      # Draw screen 1 on boot
+      - display.page.show: page1
+      - component.update: epaper_display
+
+# -- TIME (required for footer timestamps and config timeout) -
+time:
+  - platform: homeassistant
+    id: esptime
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
+  flash_size: 32MB
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+# -- HTTP REQUEST (HA REST API polling for multi-entity alerts) -
+http_request:
+  useragent: kitchen-panel/1.0
+  timeout: 5s
+
+# -- LOGGING -------------------------------------------------
+logger:
+  level: INFO
+
+# -- HOME ASSISTANT API --------------------------------------
+api:
+  encryption:
+    key: !secret api_encryption_key
+  on_client_connected:
+    - logger.log: "HA connected"
+  on_client_disconnected:
+    - logger.log: "HA disconnected"
+
+# -- OTA -----------------------------------------------------
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+# -- WIFI ----------------------------------------------------
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # IP assigned by DNS/DHCP server — no static config needed
+  ap:
+    ssid: "kitchen-panel-setup"
+    password: !secret ap_password
+
+captive_portal:
+
+# -- WEB SERVER (config mode) ---------------------------------
+# Always running but config mode activates the full UI page
+web_server:
+  port: 80
+  version: 3
+  include_internal: true
+
+# -- SPI BUS (ePaper display) --------------------------------
+spi:
+  clk_pin: GPIO7
+  mosi_pin: GPIO9
+  miso_pin: GPIO8   # Used by SD card on same bus
+
+# -- I2C BUS (SHT40 temp/humidity sensor) --------------------
+i2c:
+  scl: GPIO20
+  sda: GPIO19
+  scan: true
+
+# -- DEEP SLEEP ----------------------------------------------
+deep_sleep:
+  id: deep_sleep_ctrl
+  run_duration: 90s          # Active window: connect, update, draw, sleep
+  sleep_duration: 28min30s   # = 30 min total cycle
+  wakeup_pin: GPIO4           # Right white button wakes device
+  wakeup_pin_mode: INVERT_WAKEUP
+
+# -- GLOBALS -------------------------------------------------
+globals:
+  # Current screen (0=page1, 1=page2, 2=page3/config)
+  - id: current_page
+    type: int
+    restore_value: true
+    initial_value: '0'
+
+  # Config mode active flag
+  - id: config_mode_active
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
+  # Config mode timeout counter (seconds since last activity)
+  - id: config_idle_seconds
+    type: int
+    restore_value: false
+    initial_value: '0'
+
+  # Config timeout setting (seconds, default 600 = 10 min)
+  - id: config_timeout_seconds
+    type: int
+    restore_value: true
+    initial_value: '600'
+
+  # Battery critical threshold (%, default 10)
+  - id: battery_critical_pct
+    type: int
+    restore_value: true
+    initial_value: '10'
+
+  # Battery low threshold (%, default 20)
+  - id: battery_low_pct
+    type: int
+    restore_value: true
+    initial_value: '20'
+
+  # Transport urgent threshold (minutes, default 5)
+  - id: transport_urgent_mins
+    type: int
+    restore_value: true
+    initial_value: '5'
+
+  # Motion recent threshold (minutes, default 30)
+  - id: motion_recent_mins
+    type: int
+    restore_value: true
+    initial_value: '30'
+
+  # Middle button hold timer (milliseconds)
+  - id: btn_middle_hold_ms
+    type: int
+    restore_value: false
+    initial_value: '0'
+
+  # Long press threshold (ms) — 800ms feels natural
+  - id: btn_middle_long_ms
+    type: int
+    restore_value: true
+    initial_value: '800'
+  - id: solar_peak_expected
+    type: float
+    restore_value: true
+    initial_value: '52.0'
+
+  # Climate tolerance (degrees, default 1)
+  - id: climate_tolerance
+    type: int
+    restore_value: true
+    initial_value: '1'
+
+  # Force refresh flag -- set by HTTP handler, polled by interval
+  - id: force_refresh_flag
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
+  # -- ALERT ENTITY STATE CACHE --------------------------------
+  # 9 slots x 8 entities = 72 state strings.
+  # Populated by poll_alert_states() via HA REST API.
+  # Named: slot_state_S_E where S=slot(1-9), E=entity(1-8)
+  # Each stores the raw HA state string e.g. "on","off","cleaning"
+  # Empty string = entity not configured or unavailable.
+
+  - id: slot_state_1_1
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_1_2
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_1_3
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_1_4
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_1_5
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_1_6
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_1_7
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_1_8
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_2_1
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_2_2
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_2_3
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_2_4
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_2_5
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_2_6
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_2_7
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_2_8
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_3_1
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_3_2
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_3_3
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_3_4
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_3_5
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_3_6
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_3_7
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_3_8
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_4_1
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_4_2
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_4_3
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_4_4
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_4_5
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_4_6
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_4_7
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_4_8
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_5_1
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_5_2
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_5_3
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_5_4
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_5_5
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_5_6
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_5_7
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_5_8
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_6_1
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_6_2
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_6_3
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_6_4
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_6_5
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_6_6
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_6_7
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_6_8
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_7_1
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_7_2
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_7_3
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_7_4
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_7_5
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_7_6
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_7_7
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_7_8
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_8_1
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_8_2
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_8_3
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_8_4
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_8_5
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_8_6
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_8_7
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_8_8
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_9_1
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_9_2
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_9_3
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_9_4
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_9_5
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_9_6
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_9_7
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: slot_state_9_8
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+
+  # -- ALERT SLOT ENTITY NAMES (for display) -------------------
+  # Friendly names for each entity — shown in detail area.
+  # 9 slots x 8 names = 72 string globals.
+  # Populated from NVS by load_config_from_nvs().
+  # One slot per icon bar item (9 total).
+  # Each slot has:
+  #   alert_label_N   -- display text e.g. "Front door open"
+  #   alert_cond_N    -- condition: "eq"/"ne"/"gt"/"lt"/"contains"
+  #   alert_value_N   -- value to compare against e.g. "on"/"armed_away"/"50"
+  #   alert_enabled_N -- 1=enabled 0=suppressed
+  # Condition operators:
+  #   eq       = state == value  (e.g. "on", "armed_away", "due")
+  #   ne       = state != value  (e.g. ne "disarmed" = any armed state)
+  #   gt       = state as float > value as float
+  #   lt       = state as float < value as float
+  #   contains = value is substring of state
+
+  # Slot 1 — Alarm
+  - id: alert_label_1
+    type: std::string
+    restore_value: true
+    initial_value: '"Alarm armed"'
+  - id: alert_cond_1
+    type: std::string
+    restore_value: true
+    initial_value: '"ne"'
+  - id: alert_value_1
+    type: std::string
+    restore_value: true
+    initial_value: '"disarmed"'
+  - id: alert_enabled_1
+    type: int
+    restore_value: true
+    initial_value: '1'
+
+  # Slot 2 — Doors
+  - id: alert_label_2
+    type: std::string
+    restore_value: true
+    initial_value: '"Door open"'
+  - id: alert_cond_2
+    type: std::string
+    restore_value: true
+    initial_value: '"eq"'
+  - id: alert_value_2
+    type: std::string
+    restore_value: true
+    initial_value: '"on"'
+  - id: alert_enabled_2
+    type: int
+    restore_value: true
+    initial_value: '1'
+
+  # Slot 3 — Windows
+  - id: alert_label_3
+    type: std::string
+    restore_value: true
+    initial_value: '"Window open"'
+  - id: alert_cond_3
+    type: std::string
+    restore_value: true
+    initial_value: '"eq"'
+  - id: alert_value_3
+    type: std::string
+    restore_value: true
+    initial_value: '"on"'
+  - id: alert_enabled_3
+    type: int
+    restore_value: true
+    initial_value: '1'
+
+  # Slot 4 — Plants
+  - id: alert_label_4
+    type: std::string
+    restore_value: true
+    initial_value: '"Plants need watering"'
+  - id: alert_cond_4
+    type: std::string
+    restore_value: true
+    initial_value: '"eq"'
+  - id: alert_value_4
+    type: std::string
+    restore_value: true
+    initial_value: '"due"'
+  - id: alert_enabled_4
+    type: int
+    restore_value: true
+    initial_value: '1'
+
+  # Slot 5 — Heating
+  - id: alert_label_5
+    type: std::string
+    restore_value: true
+    initial_value: '"Heating active"'
+  - id: alert_cond_5
+    type: std::string
+    restore_value: true
+    initial_value: '"eq"'
+  - id: alert_value_5
+    type: std::string
+    restore_value: true
+    initial_value: '"on"'
+  - id: alert_enabled_5
+    type: int
+    restore_value: true
+    initial_value: '1'
+
+  # Slot 6 — Hot water
+  - id: alert_label_6
+    type: std::string
+    restore_value: true
+    initial_value: '"Hot water heating"'
+  - id: alert_cond_6
+    type: std::string
+    restore_value: true
+    initial_value: '"eq"'
+  - id: alert_value_6
+    type: std::string
+    restore_value: true
+    initial_value: '"on"'
+  - id: alert_enabled_6
+    type: int
+    restore_value: true
+    initial_value: '1'
+
+  # Slot 7 — Vacuum 1
+  - id: alert_label_7
+    type: std::string
+    restore_value: true
+    initial_value: '"Vacuum 1 running"'
+  - id: alert_cond_7
+    type: std::string
+    restore_value: true
+    initial_value: '"eq"'
+  - id: alert_value_7
+    type: std::string
+    restore_value: true
+    initial_value: '"cleaning"'
+  - id: alert_enabled_7
+    type: int
+    restore_value: true
+    initial_value: '1'
+
+  # Slot 8 — Vacuum 2
+  - id: alert_label_8
+    type: std::string
+    restore_value: true
+    initial_value: '"Vacuum 2 running"'
+  - id: alert_cond_8
+    type: std::string
+    restore_value: true
+    initial_value: '"eq"'
+  - id: alert_value_8
+    type: std::string
+    restore_value: true
+    initial_value: '"cleaning"'
+  - id: alert_enabled_8
+    type: int
+    restore_value: true
+    initial_value: '1'
+
+  # Slot 9 — Mower
+  - id: alert_label_9
+    type: std::string
+    restore_value: true
+    initial_value: '"Mower running"'
+  - id: alert_cond_9
+    type: std::string
+    restore_value: true
+    initial_value: '"eq"'
+  - id: alert_value_9
+    type: std::string
+    restore_value: true
+    initial_value: '"mowing"'
+  - id: alert_enabled_9
+    type: int
+    restore_value: true
+    initial_value: '1'
+
+  # Last refresh timestamp (seconds since boot) -- for cooldown + 12h safety net
+  - id: last_refresh_time_s
+    type: int
+    restore_value: false
+    initial_value: '0'
+
+  # Display temperature low threshold (°C) — skip refresh below this
+  - id: display_temp_min_c
+    type: int
+    restore_value: true
+    initial_value: '5'
+
+  # -- COLOR GLOBALS -------------------------------------------
+  # Color index: 0=grey 1=black 2=red 3=yellow 4=green 5=blue
+  # All default to sensible values matching the original design.
+
+  # Alarm
+  - id: color_alarm_inactive
+    type: int
+    restore_value: true
+    initial_value: '1'   # black (inactive — no true grey on Spectra 6)
+  - id: color_alarm_disarmed
+    type: int
+    restore_value: true
+    initial_value: '4'   # green
+  - id: color_alarm_armed
+    type: int
+    restore_value: true
+    initial_value: '2'   # red
+  - id: color_alarm_arming
+    type: int
+    restore_value: true
+    initial_value: '3'   # yellow
+  - id: color_alarm_triggered
+    type: int
+    restore_value: true
+    initial_value: '2'   # red
+
+  # Doors
+  - id: color_door_inactive
+    type: int
+    restore_value: true
+    initial_value: '1'   # black (inactive — no true grey on Spectra 6)
+  - id: color_door_open
+    type: int
+    restore_value: true
+    initial_value: '2'   # red
+
+  # Windows
+  - id: color_window_inactive
+    type: int
+    restore_value: true
+    initial_value: '1'   # black (inactive — no true grey on Spectra 6)
+  - id: color_window_open
+    type: int
+    restore_value: true
+    initial_value: '5'   # blue
+
+  # Plants
+  - id: color_plant_inactive
+    type: int
+    restore_value: true
+    initial_value: '1'   # black (inactive — no true grey on Spectra 6)
+  - id: color_plant_ok
+    type: int
+    restore_value: true
+    initial_value: '1'   # black (inactive — no true grey on Spectra 6)
+  - id: color_plant_due
+    type: int
+    restore_value: true
+    initial_value: '2'   # red
+  - id: color_plant_watered
+    type: int
+    restore_value: true
+    initial_value: '4'   # green
+
+  # Heating
+  - id: color_heating_inactive
+    type: int
+    restore_value: true
+    initial_value: '1'   # black (inactive — no true grey on Spectra 6)
+  - id: color_heating_active
+    type: int
+    restore_value: true
+    initial_value: '2'   # red
+
+  # Hot water
+  - id: color_hotwater_inactive
+    type: int
+    restore_value: true
+    initial_value: '1'   # black (inactive — no true grey on Spectra 6)
+  - id: color_hotwater_active
+    type: int
+    restore_value: true
+    initial_value: '2'   # red
+
+  # Vacuum 1
+  - id: color_vac1_inactive
+    type: int
+    restore_value: true
+    initial_value: '1'   # black (inactive — no true grey on Spectra 6)
+  - id: color_vac1_running
+    type: int
+    restore_value: true
+    initial_value: '4'   # green
+  - id: color_vac1_scheduled
+    type: int
+    restore_value: true
+    initial_value: '5'   # blue
+  - id: color_vac1_error
+    type: int
+    restore_value: true
+    initial_value: '2'   # red
+
+  # Vacuum 2
+  - id: color_vac2_inactive
+    type: int
+    restore_value: true
+    initial_value: '1'   # black (inactive — no true grey on Spectra 6)
+  - id: color_vac2_running
+    type: int
+    restore_value: true
+    initial_value: '4'   # green
+  - id: color_vac2_scheduled
+    type: int
+    restore_value: true
+    initial_value: '5'   # blue
+  - id: color_vac2_error
+    type: int
+    restore_value: true
+    initial_value: '2'   # red
+
+  # Mower
+  - id: color_mower_inactive
+    type: int
+    restore_value: true
+    initial_value: '1'   # black (inactive — no true grey on Spectra 6)
+  - id: color_mower_running
+    type: int
+    restore_value: true
+    initial_value: '4'   # green
+  - id: color_mower_scheduled
+    type: int
+    restore_value: true
+    initial_value: '5'   # blue
+  - id: color_mower_error
+    type: int
+    restore_value: true
+    initial_value: '2'   # red
+
+  # Battery bar
+  - id: color_battery_charging
+    type: int
+    restore_value: true
+    initial_value: '4'   # green
+  - id: color_battery_discharging
+    type: int
+    restore_value: true
+    initial_value: '3'   # yellow
+  - id: color_battery_critical
+    type: int
+    restore_value: true
+    initial_value: '2'   # red
+  - id: color_battery_full
+    type: int
+    restore_value: true
+    initial_value: '4'   # green
+  - id: color_battery_idle
+    type: int
+    restore_value: true
+    initial_value: '1'   # black
+
+# -- FONTS ---------------------------------------------------
+# Atkinson Hyperlegible — designed for low-vision/high-contrast
+# rendering, excellent on eInk at all sizes.
+# DM Mono retained for timestamps, IPs and status lines.
+# Download MDI TTF: https://github.com/Templarian/MaterialDesign-Webfont
+# Place materialdesignicons-webfont.ttf in your ESPHome config folder
+font:
+  - file: "gfonts://Atkinson Hyperlegible@700"
+    id: font_huge
+    size: 52
+    glyphs: "0123456789°C%.-+ "
+
+  - file: "gfonts://Atkinson Hyperlegible@700"
+    id: font_large
+    size: 36
+    glyphs: "0123456789°C%kWh.-+/ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz "
+
+  - file: "gfonts://Atkinson Hyperlegible@700"
+    id: font_medium
+    size: 22
+    glyphs: "0123456789°C%kWh.-+/:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz !@#&(),"
+
+  - file: "gfonts://Atkinson Hyperlegible@400"
+    id: font_small
+    size: 16
+    glyphs: "0123456789°C%kWh.-+/:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz !@#&(),"
+
+  - file: "gfonts://DM Mono@500"
+    id: font_mono_small
+    size: 13
+    glyphs: "0123456789°C%kWh.-+/:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz !@#&().,"
+
+  # MDI icon font — codepoints for all icons used in this project
+  # Full list: https://pictogrammers.com/library/mdi/
+  - file: "materialdesignicons-webfont.ttf"
+    id: font_icons_48
+    size: 48
+    glyphs:
+      # Weather icons
+      - "\U000F0590"  # mdi:weather-cloudy
+      - "\U000F0591"  # mdi:weather-fog
+      - "\U000F0592"  # mdi:weather-hail
+      - "\U000F0593"  # mdi:weather-lightning
+      - "\U000F0595"  # mdi:weather-night
+      - "\U000F0596"  # mdi:weather-partlycloudy
+      - "\U000F0597"  # mdi:weather-pouring
+      - "\U000F0598"  # mdi:weather-rainy
+      - "\U000F0599"  # mdi:weather-snowy
+      - "\U000F059D"  # mdi:weather-sunny
+      - "\U000F059E"  # mdi:weather-sunset
+      - "\U000F0F31"  # mdi:weather-partly-cloudy
+
+  - file: "materialdesignicons-webfont.ttf"
+    id: font_icons_32
+    size: 32
+    glyphs:
+      - "\U000F0D60"  # mdi:solar-power-variant
+      - "\U000F140B"  # mdi:home-lightning-bolt
+      - "\U000F0535"  # mdi:transmission-tower
+      - "\U000F004E"  # mdi:battery-80
+      - "\U000F007C"  # mdi:battery-charging-80
+      - "\U000F0008"  # mdi:battery-alert
+      - "\U000F0FD3"  # mdi:transmission-tower-export
+      - "\U000F0FD4"  # mdi:transmission-tower-import
+      - "\U000F12A3"  # mdi:battery-arrow-up (charging)
+      - "\U000F12A2"  # mdi:battery-arrow-down (discharging)
+      - "\U000F050F"  # mdi:thermometer
+      - "\U000F058E"  # mdi:water-percent
+      - "\U000F059D"  # mdi:weather-sunny (forecast)
+      - "\U000F0590"  # mdi:weather-cloudy (forecast)
+      - "\U000F0598"  # mdi:weather-rainy (forecast)
+      - "\U000F1A79"  # mdi:motion-sensor
+      - "\U000F0A70"  # mdi:account-circle
+      - "\U000F03E8"  # mdi:music
+      - "\U000F057F"  # mdi:television-play
+      - "\U000F020B"  # mdi:bus
+      - "\U000F04C1"  # mdi:train
+
+  - file: "materialdesignicons-webfont.ttf"
+    id: font_icons_26
+    size: 26
+    glyphs:
+      - "\U000F0B4E"  # mdi:shield-home
+      - "\U000F081B"  # mdi:door-open
+      - "\U000F0A15"  # mdi:window-open
+      - "\U000F024A"  # mdi:flower
+      - "\U000F06A0"  # mdi:radiator
+      - "\U000F0A96"  # mdi:water-boiler
+      - "\U000F10CC"  # mdi:robot-vacuum
+      - "\U000F10C9"  # mdi:robot-vacuum-variant
+      - "\U000F18F5"  # mdi:robot-mower
+      - "\U000F1A79"  # mdi:motion-sensor
+      - "\U000F00ED"  # mdi:calendar
+      - "\U000F0150"  # mdi:clock-outline
+
+  - file: "materialdesignicons-webfont.ttf"
+    id: font_icons_22
+    size: 22
+    glyphs:
+      - "\U000F0590"  # weather-cloudy (forecast small)
+      - "\U000F0598"  # weather-rainy
+      - "\U000F059D"  # weather-sunny
+      - "\U000F0595"  # weather-night
+      - "\U000F0596"  # weather-partlycloudy
+      - "\U000F0F31"  # weather-partly-cloudy
+
+# -- COLORS (Spectra 6 palette only) -------------------------
+color:
+  - id: COLOR_BLACK
+    red: 0%
+    green: 0%
+    blue: 0%
+  - id: COLOR_WHITE
+    red: 100%
+    green: 100%
+    blue: 100%
+  - id: COLOR_RED
+    red: 100%
+    green: 0%
+    blue: 0%
+  - id: COLOR_YELLOW
+    red: 100%
+    green: 100%
+    blue: 0%
+  - id: COLOR_GREEN
+    red: 0%
+    green: 100%
+    blue: 0%
+  - id: COLOR_BLUE
+    red: 0%
+    green: 0%
+    blue: 100%
+  - id: COLOR_GREY
+    red: 60%
+    green: 60%
+    blue: 60%
+
+# -- DISPLAY -------------------------------------------------
+# Pin mapping confirmed from Seeed Studio wiki advanced cookbook
+# and community ESPHome configs for E1002.
+# ⚠️  SCREEN LIFE: Do not display static content for >1 day.
+#     Refresh at least once per day. Avoid rapid repeated refreshes.
+#     Long-press green button 5s in factory firmware to clear screen.
+display:
+  - platform: epaper_spi
+    id: epaper_display
+    model: Seeed-reTerminal-E1002
+    cs_pin: GPIO10       # Chip select
+    dc_pin: GPIO11       # Data/command
+    busy_pin: GPIO48     # Busy signal from display
+    reset_pin: GPIO14    # Hardware reset
+    update_interval: never   # Manual updates only (deep sleep cycle)
+    pages:
+      - id: page1
+        lambda: |-
+          #include "display_lambda.h"
+          draw_page1(it);
+      - id: page2
+        lambda: |-
+          #include "display_lambda.h"
+          draw_page2(it);
+      - id: page3
+        lambda: |-
+          #include "display_lambda.h"
+          draw_page3(it);
+
+# -- HARDWARE OUTPUTS ----------------------------------------
+output:
+  # Battery measurement enable (must be HIGH to read ADC)
+  # Confirmed: GPIO21 from Seeed wiki
+  - platform: gpio
+    pin: GPIO21
+    id: bsp_battery_enable
+
+  # SD card power rail enable
+  # Confirmed: GPIO47 from Seeed wiki advanced YAML
+  - platform: gpio
+    pin: GPIO47
+    id: bsp_sd_enable
+
+  # Buzzer PWM — GPIO45, LEDC peripheral
+  # Confirmed: GPIO45 from Seeed wiki
+  - platform: ledc
+    pin: GPIO45
+    id: buzzer_pwm
+    frequency: 1000Hz
+
+# -- ONBOARD LED ---------------------------------------------
+# GPIO6, inverted=true (confirmed from Seeed wiki)
+output:
+  - platform: gpio
+    pin:
+      number: GPIO6
+      inverted: true
+    id: led_output
+
+light:
+  # LED exposed to HA — useful for alerts/notifications
+  - platform: binary
+    name: "Onboard LED"
+    id: onboard_led
+    output: led_output
+
+  # Buzzer as monochromatic light — brightness = duty cycle = volume
+  # This matches Seeed's recommended pattern exactly
+  - platform: monochromatic
+    output: buzzer_pwm
+    name: "Buzzer"
+    id: buzzer_light
+    default_transition_length: 0s
+
+# -- BUTTONS -------------------------------------------------
+# GPIO mapping confirmed from Seeed wiki advanced cookbook:
+#   GPIO3 = Green button (centre)
+#   GPIO4 = Right white button  ← also deep sleep wakeup pin
+#   GPIO5 = Left white button
+binary_sensor:
+  # Left white button — previous screen
+  - platform: gpio
+    pin:
+      number: GPIO5
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Button Left"
+    id: btn_left
+    filters:
+      - delayed_on: 20ms
+    on_press:
+      then:
+        - lambda: |-
+            id(current_page) = (id(current_page) - 1 + 3) % 3;
+        - script.execute: show_current_page
+
+  # Green button — short press = force refresh, long press = config mode
+  - platform: gpio
+    pin:
+      number: GPIO3
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Button Middle"
+    id: btn_middle
+    filters:
+      - delayed_on: 20ms
+    on_press:
+      then:
+        - script.execute: btn_middle_timer_start
+    on_release:
+      then:
+        - script.execute: btn_middle_timer_stop
+
+  # Right white button — next screen (also deep sleep wakeup)
+  - platform: gpio
+    pin:
+      number: GPIO4
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Button Right"
+    id: btn_right
+    filters:
+      - delayed_on: 20ms
+    on_press:
+      then:
+        - lambda: |-
+            id(current_page) = (id(current_page) + 1) % 3;
+        - script.execute: show_current_page
+
+# -- SENSORS -------------------------------------------------
+sensor:
+  # -- Device battery --------------------------------------
+  - platform: adc
+    pin: GPIO1
+    name: "Device Battery Voltage"
+    id: battery_voltage
+    update_interval: 600s
+    attenuation: 12db
+    filters:
+      - multiply: 2.0    # Voltage divider compensation
+    unit_of_measurement: "V"
+    accuracy_decimals: 2
+
+  - platform: template
+    name: "Device Battery Level"
+    id: battery_level
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    icon: "mdi:battery"
+    device_class: battery
+    state_class: measurement
+    # Use calibrate_linear from raw voltage — matches Seeed wiki LiPo curve exactly
+    lambda: 'return id(battery_voltage).state;'
+    update_interval: 600s
+    filters:
+      - calibrate_linear:
+          - 4.15 -> 100.0
+          - 3.96 -> 90.0
+          - 3.91 -> 80.0
+          - 3.85 -> 70.0
+          - 3.80 -> 60.0
+          - 3.75 -> 50.0
+          - 3.68 -> 40.0
+          - 3.58 -> 30.0
+          - 3.49 -> 20.0
+          - 3.41 -> 10.0
+          - 3.30 -> 5.0
+          - 3.27 -> 0.0
+      - clamp:
+          min_value: 0
+          max_value: 100
+
+  # -- Internal temperature / humidity (SHT40) --------------
+  - platform: sht4x
+    temperature:
+      name: "Internal Temperature"
+      id: internal_temp_sensor
+    humidity:
+      name: "Internal Humidity"
+      id: internal_humidity_sensor
+    update_interval: 60s
+    address: 0x44
+
+  # -- HA entity subscriptions — Weather --------------------
+  - platform: homeassistant
+    id: ha_temperature
+    entity_id: weather.home
+    attribute: temperature
+    internal: true
+
+  - platform: homeassistant
+    id: ha_humidity
+    entity_id: weather.home
+    attribute: humidity
+    internal: true
+
+  - platform: homeassistant
+    id: ha_wind_speed
+    entity_id: weather.home
+    attribute: wind_speed
+    internal: true
+
+  - platform: homeassistant
+    id: ha_feels_like
+    entity_id: weather.home
+    attribute: apparent_temperature
+    internal: true
+
+  # -- HA entity subscriptions — Solar ----------------------
+  - platform: homeassistant
+    id: ha_solar_today
+    entity_id: sensor.solar_energy_today
+    internal: true
+
+  - platform: homeassistant
+    id: ha_solar_expected
+    entity_id: sensor.solar_forecast_today
+    internal: true
+
+  - platform: homeassistant
+    id: ha_load_today
+    entity_id: sensor.home_consumption_today
+    internal: true
+
+  - platform: homeassistant
+    id: ha_grid_export
+    entity_id: sensor.grid_export_today
+    internal: true
+
+  - platform: homeassistant
+    id: ha_grid_import
+    entity_id: sensor.grid_import_today
+    internal: true
+
+  # -- HA entity subscriptions — Battery --------------------
+  - platform: homeassistant
+    id: ha_battery_soc
+    entity_id: sensor.battery_soc
+    internal: true
+
+  # -- HA entity subscriptions — Room Temperatures ----------
+  - platform: homeassistant
+    id: ha_temp_main_bed
+    entity_id: sensor.main_bed_temperature
+    internal: true
+
+  - platform: homeassistant
+    id: ha_humid_main_bed
+    entity_id: sensor.main_bed_humidity
+    internal: true
+
+  - platform: homeassistant
+    id: ha_temp_guest
+    entity_id: sensor.guest_temperature
+    internal: true
+
+  - platform: homeassistant
+    id: ha_humid_guest
+    entity_id: sensor.guest_humidity
+    internal: true
+
+  - platform: homeassistant
+    id: ha_temp_bathroom
+    entity_id: sensor.bathroom_temperature
+    internal: true
+
+  - platform: homeassistant
+    id: ha_humid_bathroom
+    entity_id: sensor.bathroom_humidity
+    internal: true
+
+  - platform: homeassistant
+    id: ha_temp_office
+    entity_id: sensor.office_temperature
+    internal: true
+
+  - platform: homeassistant
+    id: ha_humid_office
+    entity_id: sensor.office_humidity
+    internal: true
+
+  - platform: homeassistant
+    id: ha_temp_living
+    entity_id: sensor.living_temperature
+    internal: true
+
+  - platform: homeassistant
+    id: ha_humid_living
+    entity_id: sensor.living_humidity
+    internal: true
+
+  - platform: homeassistant
+    id: ha_temp_kitchen
+    entity_id: sensor.kitchen_temperature
+    internal: true
+
+  - platform: homeassistant
+    id: ha_humid_kitchen
+    entity_id: sensor.kitchen_humidity
+    internal: true
+
+  # -- WiFi signal strength ---------------------------------
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    id: wifi_signal_sensor
+    update_interval: 60s
+
+# -- TEXT SENSORS ---------------------------------------------
+text_sensor:
+  # Weather condition string
+  - platform: homeassistant
+    id: ha_weather_condition
+    entity_id: weather.home
+    internal: true
+
+  # Forecast text (rendered by ha_templates.yaml template sensor)
+  - platform: homeassistant
+    id: ha_forecast_later_condition
+    entity_id: sensor.forecast_later_condition
+    internal: true
+
+  - platform: homeassistant
+    id: ha_forecast_day1_condition
+    entity_id: sensor.forecast_day1_condition
+    internal: true
+
+  - platform: homeassistant
+    id: ha_forecast_day2_condition
+    entity_id: sensor.forecast_day2_condition
+    internal: true
+
+  - platform: homeassistant
+    id: ha_forecast_day1_label
+    entity_id: sensor.forecast_day1_label
+    internal: true
+
+  - platform: homeassistant
+    id: ha_forecast_day2_label
+    entity_id: sensor.forecast_day2_label
+    internal: true
+
+  - platform: homeassistant
+    id: ha_forecast_later_temp
+    entity_id: sensor.forecast_later_temp
+    internal: true
+
+  - platform: homeassistant
+    id: ha_forecast_day1_temp
+    entity_id: sensor.forecast_day1_temp
+    internal: true
+
+  - platform: homeassistant
+    id: ha_forecast_day2_temp
+    entity_id: sensor.forecast_day2_temp
+    internal: true
+
+  # Battery status string: charging / discharging / idle / full
+  - platform: homeassistant
+    id: ha_battery_status
+    entity_id: sensor.battery_status
+    internal: true
+
+  # Battery ETA string: "14:30" or "" if idle/full
+  - platform: homeassistant
+    id: ha_battery_eta
+    entity_id: sensor.battery_time_to_full
+    internal: true
+
+  # Alarm state -- kept as direct subscription (single entity, always needed)
+  - platform: homeassistant
+    id: ha_alarm_state
+    entity_id: alarm_control_panel.home
+    internal: true
+
+  # -- MULTI-ENTITY ALERT SLOT STATES --------------------------
+  # Entity states for slots 1-9, up to 8 entities each.
+  # Stored as a 9x8 string matrix in globals, populated by
+  # poll_alert_states() which calls HA REST API on each refresh.
+  # Format: "on", "off", "cleaning", "armed_away", etc.
+  # Empty string = entity not configured for this slot.
+
+  # Alert lines are now evaluated LOCALLY in display_lambda.h
+  # No HA template sensors needed for alerts.
+  # Each icon slot has configurable entities/names/condition in NVS.
+
+  # Calendar lines (formatted by HA template)
+  - platform: homeassistant
+    id: ha_cal_line_1
+    entity_id: sensor.panel_cal_line_1
+    internal: true
+
+  - platform: homeassistant
+    id: ha_cal_line_2
+    entity_id: sensor.panel_cal_line_2
+    internal: true
+
+  - platform: homeassistant
+    id: ha_cal_line_3
+    entity_id: sensor.panel_cal_line_3
+    internal: true
+
+  - platform: homeassistant
+    id: ha_cal_line_4
+    entity_id: sensor.panel_cal_line_4
+    internal: true
+
+  # Media players
+  - platform: homeassistant
+    id: ha_media1_title
+    entity_id: sensor.panel_media1_title
+    internal: true
+
+  - platform: homeassistant
+    id: ha_media1_room
+    entity_id: sensor.panel_media1_room
+    internal: true
+
+  - platform: homeassistant
+    id: ha_media2_title
+    entity_id: sensor.panel_media2_title
+    internal: true
+
+  - platform: homeassistant
+    id: ha_media2_room
+    entity_id: sensor.panel_media2_room
+    internal: true
+
+  # Transport departure times
+  - platform: homeassistant
+    id: ha_transport1_dep1
+    entity_id: sensor.bus_42_next
+    internal: true
+
+  - platform: homeassistant
+    id: ha_transport1_dep2
+    entity_id: sensor.bus_42_next2
+    internal: true
+
+  - platform: homeassistant
+    id: ha_transport2_dep1
+    entity_id: sensor.train_next
+    internal: true
+
+  - platform: homeassistant
+    id: ha_transport2_dep2
+    entity_id: sensor.train_next2
+    internal: true
+
+  - platform: homeassistant
+    id: ha_transport3_dep1
+    entity_id: sensor.bus_7_next
+    internal: true
+
+  - platform: homeassistant
+    id: ha_transport3_dep2
+    entity_id: sensor.bus_7_next2
+    internal: true
+
+  # Motion sensors — last triggered time (formatted HH:MM by HA template)
+  - platform: homeassistant
+    id: ha_motion1_time
+    entity_id: sensor.panel_motion1_time
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion1_name
+    entity_id: sensor.panel_motion1_name
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion2_time
+    entity_id: sensor.panel_motion2_time
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion2_name
+    entity_id: sensor.panel_motion2_name
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion3_time
+    entity_id: sensor.panel_motion3_time
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion3_name
+    entity_id: sensor.panel_motion3_name
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion4_time
+    entity_id: sensor.panel_motion4_time
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion4_name
+    entity_id: sensor.panel_motion4_name
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion5_time
+    entity_id: sensor.panel_motion5_time
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion5_name
+    entity_id: sensor.panel_motion5_name
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion6_time
+    entity_id: sensor.panel_motion6_time
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion6_name
+    entity_id: sensor.panel_motion6_name
+    internal: true
+
+  # Motion recent flags (true/false) — set by HA template
+  - platform: homeassistant
+    id: ha_motion1_recent
+    entity_id: binary_sensor.panel_motion1_recent
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion2_recent
+    entity_id: binary_sensor.panel_motion2_recent
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion3_recent
+    entity_id: binary_sensor.panel_motion3_recent
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion4_recent
+    entity_id: binary_sensor.panel_motion4_recent
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion5_recent
+    entity_id: binary_sensor.panel_motion5_recent
+    internal: true
+
+  - platform: homeassistant
+    id: ha_motion6_recent
+    entity_id: binary_sensor.panel_motion6_recent
+    internal: true
+
+  # WiFi IP for QR code on page 3
+  - platform: wifi_info
+    ip_address:
+      name: "WiFi IP"
+      id: wifi_ip_address
+
+  # AP password exposed as text sensor so display lambda can build
+  # the WiFi QR code string when device is in AP/captive portal mode
+  - platform: template
+    name: "AP Password"
+    id: ap_password_global
+    lambda: 'return {nvs_read_str("ap_password", "kitchen-setup")};'
+    update_interval: never
+    internal: true
+
+# -- SCRIPTS -------------------------------------------------
+script:
+  # Middle button press timer — increments every 50ms while held
+  - id: btn_middle_timer_start
+    then:
+      - lambda: 'id(btn_middle_hold_ms) = 0;'
+      - while:
+          condition:
+            binary_sensor.is_on: btn_middle
+          then:
+            - delay: 50ms
+            - lambda: 'id(btn_middle_hold_ms) += 50;'
+
+  # Middle button release — decide short vs long press
+  - id: btn_middle_timer_stop
+    then:
+      - lambda: |-
+          if (id(btn_middle_hold_ms) >= id(btn_middle_long_ms)) {
+            // Long press — toggle config mode
+            if (id(config_mode_active)) {
+              id(config_mode_active) = false;
+              id(config_idle_seconds) = 0;
+              id(current_page) = 0;
+            } else {
+              id(config_mode_active) = true;
+              id(config_idle_seconds) = 0;
+              id(current_page) = 2;
+            }
+          }
+          // Short press always triggers refresh regardless
+          // (config mode entry also redraws via show_current_page)
+      - if:
+          condition:
+            lambda: 'return id(btn_middle_hold_ms) < id(btn_middle_long_ms);'
+          then:
+            # Short press — force refresh current page
+            - component.update: battery_level
+            - component.update: internal_temp_sensor
+            - script.execute: show_current_page
+          else:
+            # Long press — show new page (config or page 1)
+            - script.execute: show_current_page
+
+  # Show whichever page is current, handle sleep suppression
+  - id: show_current_page
+    then:
+      - lambda: |-
+          // -- Low battery guard -----------------------------------
+          // Don't refresh if battery critically low — voltage sag
+          // mid-refresh can permanently damage Spectra 6 pixels.
+          // Display lambda will show red battery icon in footer.
+          float bat = id(battery_level).state;
+          if (bat < 5.0f) {
+            ESP_LOGW("display", "Battery too low (%.0f%%) — skipping refresh", bat);
+            return;
+          }
+
+          // -- Temperature guard -----------------------------------
+          // Spectra 6 operating range: 0°C–50°C.
+          // Display lambda will show red thermometer in footer
+          // when temp is outside safe range.
+          float temp = id(internal_temp_sensor).state;
+          float temp_min = (float)id(display_temp_min_c);
+          if (temp < temp_min || temp > 50.0f) {
+            ESP_LOGW("display", "Temp out of range (%.1f°C) — skipping refresh", temp);
+            // Still show page — lambda draws the warning indicator
+            // but skips the actual display update
+          }
+
+          // -- Refresh cooldown ------------------------------------
+          // Minimum 60s between refreshes to protect display longevity
+          int now_s = (int)(millis() / 1000);
+          if ((now_s - id(last_refresh_time_s)) < 60 && id(last_refresh_time_s) > 0) {
+            ESP_LOGD("display", "Cooldown active — skipping refresh");
+            return;
+          }
+          id(last_refresh_time_s) = now_s;
+
+          // -- Poll entity states from HA REST API -------------
+          // Fetches all configured alert slot entities in one pass
+          poll_alert_states();
+
+          // -- Show page -------------------------------------------
+          switch (id(current_page)) {
+            case 0: id(epaper_display).show_page(id(page1)); break;
+            case 1: id(epaper_display).show_page(id(page2)); break;
+            case 2: id(epaper_display).show_page(id(page3)); break;
+          }
+      - component.update: epaper_display
+      - lambda: |-
+          // Suppress deep sleep if on config page
+          if (id(current_page) == 2) {
+            id(deep_sleep_ctrl).prevent_deep_sleep();
+          }
+
+  # Config mode idle watchdog — called every 60s by interval
+  - id: check_config_timeout
+    then:
+      - lambda: |-
+          if (!id(config_mode_active)) return;
+          id(config_idle_seconds) += 60;
+          if (id(config_idle_seconds) >= id(config_timeout_seconds)) {
+            // Timeout — exit config mode, return to page 1
+            id(config_mode_active) = false;
+            id(config_idle_seconds) = 0;
+            id(current_page) = 0;
+            id(show_current_page).execute();
+          }
+
+  # Reset config idle timer (called by web server activity)
+  - id: reset_config_timer
+    then:
+      - lambda: |-
+          id(config_idle_seconds) = 0;
+
+# -- INTERVALS ------------------------------------------------
+interval:
+  # Force refresh flag poll -- set by HTTP API handler
+  - interval: 1s
+    then:
+      - if:
+          condition:
+            lambda: 'return id(force_refresh_flag);'
+          then:
+            - lambda: 'id(force_refresh_flag) = false;'
+            - component.update: battery_level
+            - script.execute: show_current_page
+
+  # Config mode timeout watchdog
+  - interval: 60s
+    then:
+      - script.execute: check_config_timeout
+
+  # Periodic display refresh when not in deep sleep (config mode)
+  - interval: 30min
+    then:
+      - if:
+          condition:
+            lambda: 'return !id(config_mode_active);'
+          then:
+            - component.update: battery_level
+            - component.update: epaper_display
+
+  # 12-hour forced refresh safety net
+  # Protects against burn-in if deep sleep cycle stalls
+  # Bypasses normal cooldown — always fires
+  - interval: 12h
+    then:
+      - lambda: 'id(last_refresh_time_s) = 0;'  # reset cooldown
+      - component.update: battery_level
+      - component.update: internal_temp_sensor
+      - script.execute: show_current_page
+      - logger.log: "12h safety refresh triggered"
