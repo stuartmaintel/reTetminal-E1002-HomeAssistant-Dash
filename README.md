@@ -2,7 +2,8 @@
 
 A fully configurable e-ink smart home dashboard built with ESPHome for the Seeed Studio reTerminal E1002.
 
-![All Screens](docs/all-screens.png)
+<img width="657" height="480" alt="image" src="https://github.com/user-attachments/assets/eb65be96-7b55-4d2d-a098-0683374e99e9" />
+
 
 ## Hardware
 
