@@ -4,6 +4,9 @@ A fully configurable e-ink smart home dashboard built with ESPHome for the Seeed
 
 <img width="657" height="480" alt="image" src="https://github.com/user-attachments/assets/eb65be96-7b55-4d2d-a098-0683374e99e9" />
 
+<img width="1000" height="596" alt="image" src="https://github.com/user-attachments/assets/478c8a15-60eb-4c50-aa96-a54c0767de22" />
+
+
 
 ## Hardware
 
